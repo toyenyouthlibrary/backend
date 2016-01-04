@@ -22,7 +22,7 @@ $test_uname = "SELECT * FROM lib_User WHERE username='" . $username . "'";
 $test_uname_result = $conn->query($test_uname);
 if ($test_uname_result->num_rows > 0) {
     //det finnes mer enn 0 rader, ergo finnes brukernavnet
-    $error_array["error"]="brukernavn tatt";
+    $error_array["error"]="Brukernavnet er allerede tatt.";
     die(json_encode($error_array)); //errorkode for at brukernavn er tatt
 }
 
@@ -32,7 +32,7 @@ $test_email = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
 $test_email_result = $conn->query($test_email);
 if ($test_email_result->num_rows > 0) {
     //det finnes mer enn 0 rader, ergo finnes emailen allerede
-    $error_array["error"]="rfid tatt";
+    $error_array["error"]="Det finnes allerede en bruker med den RFIDen.";
     die(json_encode($error_array)); //kode for RFID tatt
 }
 
@@ -50,7 +50,7 @@ if(!empty($firstname) || !empty($email)){
         $userid=$conn->insert_id;
 
     }else{
-        $error_array["error"]="kunne ikke lage bruker";
+        $error_array["error"]="Klarte ikke å registrere brukeren, vennligst prøv igjen senere.";
         die(json_encode($error_array));
 
     }
@@ -64,7 +64,7 @@ if(!empty($firstname) || !empty($email)){
         $contactid=$conn->insert_id;
 
     }else{
-        $error_array["error"]="kunne ikke lage contact";
+        $error_array["error"]="Klarte ikke å lagre kontaktinformasjon.";
         die(json_encode($error_array));
 
     }
@@ -80,7 +80,7 @@ if(!empty($firstname) || !empty($email)){
             $error_array["error"]="";
             die(json_encode($error_array));
         } else {
-            $error_array["error"]="kunne ikke lage relasjon mellom contact og user";
+            $error_array["error"]="Klarte ikke å linke kontaktinformasjonen med brukeren.";
             die(json_encode($error_array));
 
         }
@@ -100,7 +100,7 @@ else{
         $error_array["error"]="";
         die(json_encode($error_array));
     }else{
-        $error_array["error"]="kunne ikke lage bruker";
+        $error_array["error"]="Klarte ikke å lagre brukeren.";
         die(json_encode($error_array));
 
     }

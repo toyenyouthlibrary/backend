@@ -5,15 +5,15 @@ session_start();
 //init av variabler
 //låne bøker
 //errorvariabler
-$user_rfid_missing="User rfid is missing";
-$book_rfid_missing="Book rfid is missing";
-$userid_error="Could not get userID";
-$bookid_error="Could not get bookID";
-$error_bookid="Error with bookID";
-$error_userid="Error with userID";
+$user_rfid_missing="Brukerens RFID mangler.";
+$book_rfid_missing="Bokens RFID mangler.";
+$userid_error="Klarte ikke å finne bruker id i databasen.";
+$bookid_error="Klarte ikke å finne bok id i databasen.";
+$error_bookid="Klarte ikke å finne boken i databasen.";
+$error_userid="Klarte ikke å finne brukeren i databasen.";
 $no_error="";
-$could_not_lend="Could not insert values into lend table";
-$book_lended="The book with this id is already lended to someone else";
+$could_not_lend="Klarte ikke å lagre lånet.";
+$book_lended="Noen har allerede lånt denne boken.";
 
 //funksjon for å dø :( med errormelding
 function error_die($error_message) {
