@@ -1,4 +1,4 @@
 Backend (PHP)
 ==============================
 
-## Hosts the API for LibLog
+Hosts the API for LibLog
