@@ -27,7 +27,7 @@ if(isset($_POST["username"])) {
 
         }
     } else {
-        $error_array["error"] = "Could not find user";
+        $error_array["error"] = "Brukeren ".$username." finnes ikke i våre systemer.";
         die(json_encode($error_array));
     }
 }
@@ -42,13 +42,13 @@ if(isset($_POST["rfid"])){
             $user_info["username"] = $row["username"];
         }
     } else {
-        $error_array["error"] = "Could not find user";
+        $error_array["error"] = "Ingen registrerte brukere med denne RFIDen";
         die(json_encode($error_array));
     }
 }
 
 if(empty($user_info["userID"])){
-    $user_info["error"]="Error with getting user info";
+    $user_info["error"]="Klarte ikke å finne informasjon om brukeren.";
     echo json_encode($user_info);
 }
 
