@@ -5,7 +5,6 @@ require('../koble_til_database.php');
 //init av variabler
 $username=$_POST["username"];
 $error_array["error"]="";
-$rfid=$_POST["rfid"];
 $user_info = array();
 /*
  * variabelen $conn er hentet fra koble_til_database.php
@@ -49,7 +48,24 @@ if(isset($_POST["rfid"])){
 
 if(empty($user_info["userID"])){
     $user_info["error"]="Klarte ikke &aring; finne informasjon om brukeren.";
-    echo json_encode($user_info);
+    die(json_encode($user_info));
+}
+
+$get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book WHERE userID='" . $user_info['userID'] . "'";
+$get_books_qry = $conn->query($get_books);
+$xx = 0;
+$total_time = 0;
+if ($get_books_qry->num_rows > 0) {
+    while($book = $get_books_qry->fetch_assoc()){
+        $xx++;
+        if($book['timediff'] == null){
+            $total_time += time() - strtotime($book['outDate']);
+        }else{
+            $total_time += $book['timediff'];
+        }
+    }
+}else{
+    //echo "No books borrowed";
 }
 
 $contact_nr=array();
@@ -70,16 +86,30 @@ if ($test_uname_result->num_rows > 0) {
                 $usernr++;
             }
 
-        }else{
         }
     }
 }else{
 
 }
+$user_info['total_times_borrowed'] = $xx;
+$user_info['total_time_borrowed'] = convertSecondsToReadable($total_time);
 
 $user_info["error"]="";
 echo json_encode($user_info);
     //end
 
+function convertSecondsToReadable($seconds){
+    //Find difference in time in a readable format
+    $dtF = new DateTime("@0");
+    $dtT = new DateTime("@$seconds");
+    $readable["months"] = (int) $dtF->diff($dtT)->format('%m');
+    $readable["days"] = (int) $dtF->diff($dtT)->format('%a');
+    $readable["hours"] = (int) $dtF->diff($dtT)->format('%h');
+    $readable["minutes"] = (int) $dtF->diff($dtT)->format('%i');
+    $readable["seconds"] = (int) $dtF->diff($dtT)->format('%s');
+    $result = "";
+    $prev_value = false;
+    return $readable;
+}
 
 ?>
