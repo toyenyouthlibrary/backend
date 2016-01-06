@@ -22,6 +22,8 @@ if ($get_books_qry->num_rows > 0) {
     }
 }else{
     //echo "No books borrowed";
+    $res['error'] = "Ingen b&oslash;ker er utl&aring;nt.";
+    die(json_encode($res));
 }
 
 $res["total_time_lended"] = convertSecondsToReadable($total_time);
