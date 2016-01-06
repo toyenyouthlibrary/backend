@@ -1,7 +1,7 @@
 <?php
 require('../koble_til_database.php');
 session_start();
-$rfid = $_POST["rfid"];
+$rfid = $_GET["rfid"];
 
 $get_book = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
 $get_book_info_result = $conn->query($get_book);
@@ -15,6 +15,7 @@ if ($get_book_info_result->num_rows > 0) {
     }
     die(json_encode($books));
 } else {
-    die(json_encode("FALSE"));
+    $books[] = "FALSE";
+    die(json_encode($books));
 }
 ?>

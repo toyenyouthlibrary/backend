@@ -18,7 +18,7 @@ if ($get_book_qry->num_rows > 0) {
     if($book = $get_book_qry->fetch_assoc()){
         $total_lended_time = 0;
         $borrowers = array();
-        $status = "Ikke lånt ut";
+        $status = "Ikke l&aring;nt ut";
         
         $get_lending_stats = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, userID, inDate, outDate FROM lib_User_Book WHERE bookID = '".$book['bookID']."'";
         $get_lending_stats_qry = $conn->query($get_lending_stats);
@@ -26,7 +26,7 @@ if ($get_book_qry->num_rows > 0) {
             while($lending_stats = $get_lending_stats_qry->fetch_assoc()){
                 $total_lended_time = $total_lended_time + $lending_stats["timediff"];
                 if($lending_stats['inDate'] == null){
-                    $status = "Lånt ut";
+                    $status = "L&aring;nt ut";
                     $current = true;
                     //Calculating live timediff
                     $currtime = time() - strtotime($lending_stats['outDate']);

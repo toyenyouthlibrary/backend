@@ -27,7 +27,7 @@ if(isset($_POST["username"])) {
 
         }
     } else {
-        $error_array["error"] = "Brukeren ".$username." finnes ikke i våre systemer.";
+        $error_array["error"] = "Brukeren ".$username." finnes ikke i v&aring;re systemer.";
         die(json_encode($error_array));
     }
 }
@@ -48,7 +48,7 @@ if(isset($_POST["rfid"])){
 }
 
 if(empty($user_info["userID"])){
-    $user_info["error"]="Klarte ikke å finne informasjon om brukeren.";
+    $user_info["error"]="Klarte ikke &aring; finne informasjon om brukeren.";
     echo json_encode($user_info);
 }
 

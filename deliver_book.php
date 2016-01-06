@@ -3,22 +3,22 @@
 require('../koble_til_database.php');
 session_start();
 //init av variabler
-//låne bøker
+//l&aring;ne b&oslash;ker
 
 //errorvariabler
 $user_rfid_missing="Brukerens RFID mangler";
 $book_rfid_missing="Bokens RFID mangler.";
-$userid_error="Klarte ikke å finne bruker id i databasen.";
-$bookid_error="Klarte ikke å finne bok id i databasen.";
-$error_bookid="Klarte ikke å finne boken i databasen.";
-$error_userid="Klarte ikke å finne brukeren i databasen.";
+$userid_error="Klarte ikke &aring; finne bruker id i databasen.";
+$bookid_error="Klarte ikke &aring; finne bok id i databasen.";
+$error_bookid="Klarte ikke &aring; finne boken i databasen.";
+$error_userid="Klarte ikke &aring; finne brukeren i databasen.";
 $no_error="";
-$could_not_lend="Klarte ikke å registrere boklånet.";
-$book_lended="Det er allerede noen som låner denne boken.";
-$book_not_lended="Det er ingen som har lånt denne boken.";
-$could_not_deliver="Klarte ikke å avregistrere lånet.";
+$could_not_lend="Klarte ikke &aring; registrere bokl&aring;net.";
+$book_lended="Det er allerede noen som l&aring;ner denne boken.";
+$book_not_lended="Det er ingen som har l&aring;nt denne boken.";
+$could_not_deliver="Klarte ikke &aring; avregistrere l&aring;net.";
 
-//funksjon for å dø :( med errormelding
+//funksjon for &aring; d&oslash; :( med errormelding
 function error_die($error_message) {
     $error_msg=array();
     $error_msg["error"]=$error_message;
@@ -27,7 +27,7 @@ function error_die($error_message) {
 //her trenger vi forskjellige variable
 $book_rfid = (isset($_POST["book_rfid"]) ? $_POST["book_rfid"] : error_die($book_rfid_missing));
 $bookid=null;
-//her bør det vurderes om det er lurt at API setter dato for når boka er innlevert av forskjellige grunner..
+//her b&oslash;r det vurderes om det er lurt at API setter dato for n&aring;r boka er innlevert av forskjellige grunner..
 $date= (new DateTime())->format('Y-m-d H:i:s');
 
 //henter ut bokid med Rfid
@@ -58,7 +58,7 @@ if ($check_book_result->num_rows > 0) {
     error_die($book_not_lended);
 }
 
-//alt er klart for å levere boka
+//alt er klart for &aring; levere boka
 $deliver_book = "UPDATE lib_User_Book SET inDate='".$date."' WHERE user_book_ID='".$lib_user_book_ID."'";
 $deliver_book_result = $conn->query($deliver_book);
 if ($deliver_book_result === TRUE) {

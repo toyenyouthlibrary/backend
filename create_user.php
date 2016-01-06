@@ -3,7 +3,7 @@
 require('../koble_til_database.php');
 session_start();
 //init av variabler
-//for å lage en enkel bruker
+//for &aring; lage en enkel bruker
 $username = (isset($_POST["username"]) ? $_POST["username"] : NULL);
 $rfid = (isset($_POST["rfid"]) ? $_POST["rfid"] : NULL);
 
@@ -50,7 +50,7 @@ if(!empty($firstname) || !empty($email)){
         $userid=$conn->insert_id;
 
     }else{
-        $error_array["error"]="Klarte ikke å registrere brukeren, vennligst prøv igjen senere.";
+        $error_array["error"]="Klarte ikke &aring; registrere brukeren, vennligst pr&oslash;v igjen senere.";
         die(json_encode($error_array));
 
     }
@@ -64,7 +64,7 @@ if(!empty($firstname) || !empty($email)){
         $contactid=$conn->insert_id;
 
     }else{
-        $error_array["error"]="Klarte ikke å lagre kontaktinformasjon.";
+        $error_array["error"]="Klarte ikke &aring; lagre kontaktinformasjon.";
         die(json_encode($error_array));
 
     }
@@ -80,7 +80,7 @@ if(!empty($firstname) || !empty($email)){
             $error_array["error"]="";
             die(json_encode($error_array));
         } else {
-            $error_array["error"]="Klarte ikke å linke kontaktinformasjonen med brukeren.";
+            $error_array["error"]="Klarte ikke &aring; linke kontaktinformasjonen med brukeren.";
             die(json_encode($error_array));
 
         }
@@ -100,7 +100,7 @@ else{
         $error_array["error"]="";
         die(json_encode($error_array));
     }else{
-        $error_array["error"]="Klarte ikke å lagre brukeren.";
+        $error_array["error"]="Klarte ikke &aring; lagre brukeren.";
         die(json_encode($error_array));
 
     }

@@ -3,19 +3,19 @@
 require('../koble_til_database.php');
 session_start();
 //init av variabler
-//låne bøker
+//l&aring;ne b&oslash;ker
 //errorvariabler
 $user_rfid_missing="Brukerens RFID mangler.";
 $book_rfid_missing="Bokens RFID mangler.";
-$userid_error="Klarte ikke å finne bruker id i databasen.";
-$bookid_error="Klarte ikke å finne bok id i databasen.";
-$error_bookid="Klarte ikke å finne boken i databasen.";
-$error_userid="Klarte ikke å finne brukeren i databasen.";
+$userid_error="Klarte ikke &aring; finne bruker id i databasen.";
+$bookid_error="Klarte ikke &aring; finne bok id i databasen.";
+$error_bookid="Klarte ikke &aring; finne boken i databasen.";
+$error_userid="Klarte ikke &aring; finne brukeren i databasen.";
 $no_error="";
-$could_not_lend="Klarte ikke å lagre lånet.";
-$book_lended="Noen har allerede lånt denne boken.";
+$could_not_lend="Klarte ikke &aring; lagre l&aring;net.";
+$book_lended="Noen har allerede l&aring;nt denne boken.";
 
-//funksjon for å dø :( med errormelding
+//funksjon for &aring; d&oslash; :( med errormelding
 function error_die($error_message) {
     $error_msg=array();
     $error_msg["error"]=$error_message;
@@ -27,11 +27,11 @@ $book_rfid = (isset($_POST["book_rfid"]) ? $_POST["book_rfid"] : error_die($book
 $userid=null;
 $bookid=null;
 
-//her bør det vurderes om det er lurt at API setter dato for når boka er innlevert av forskjellige grunner..
+//her b&oslash;r det vurderes om det er lurt at API setter dato for n&aring;r boka er innlevert av forskjellige grunner..
 $date= (new DateTime())->format('Y-m-d H:i:s');
 
-//prøver queryen:
-//her burde være en rutine som sjekker om boka allerede er lånt ut, og merker den som innlevert.
+//pr&oslash;ver queryen:
+//her burde være en rutine som sjekker om boka allerede er l&aring;nt ut, og merker den som innlevert.
 //henter ut brukerid fra rfid:
 $get_user_id = "SELECT * FROM lib_User WHERE rfid='".$user_rfid."'";
 $get_user_id_result = $conn->query($get_user_id);
@@ -69,7 +69,7 @@ if ($check_book_result->num_rows > 0) {
     error_die($book_lended);
 }
 
-//alt er klart for å leie boka
+//alt er klart for &aring; leie boka
 $lend_book = "INSERT INTO lib_User_Book(userID, outDate, bookID) VALUES ('".$userid."', '".$date."', '".$bookid."')";
     $lend_book_result = $conn->query($lend_book);
 if ($lend_book_result === TRUE) {

@@ -3,7 +3,7 @@
 require('../koble_til_database.php');
 session_start();
 
-$nonexistant_user = 'Den etterspurte brukeren finnes ikke i våre systemer.';
+$nonexistant_user = 'Den etterspurte brukeren finnes ikke i v&aring;re systemer.';
 
 $username = $_POST['username'];
 
@@ -33,7 +33,7 @@ if ($get_user_info_result->num_rows > 0) {
                 }
             }
         }else{
-            $res['error'] = "Brukeren har ikke lånt noen bøker.";
+            $res['error'] = "Brukeren har ikke l&aring;nt noen b&oslash;ker.";
         }
         echo json_encode($res);
     }

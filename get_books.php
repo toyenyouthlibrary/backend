@@ -31,23 +31,3 @@ if ($get_books_qry->num_rows > 0) {
 }
 
 ?>
-<!--
-{"error":"","books":[{"id":null,"RFID":"1","ISBN":"256-17-915-5679-7"},{"id":null,"RFID":"36","ISBN":"038-17-788-7359-1"}]}
-{
-   "error": "",
-   "books": [
-      {
-         "id": null,
-         "RFID": "1",
-         "ISBN": "256-17-915-5679-7"
-      },
-      {
-         "id": null,
-         "RFID": "36",
-         "ISBN": "038-17-788-7359-1"
-      }
-   ]
-}
-
-{"error":"Ingen bøker er registrert.","books":[]}
--->
