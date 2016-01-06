@@ -3,7 +3,6 @@
 require('../koble_til_database.php');
 
 //init av variabler
-$username=$_POST["username"];
 $error_array["error"]="";
 $user_info = array();
 /*
@@ -15,6 +14,7 @@ $user_info = array();
 //henter info og pusher det inn i ett array
 
 if(isset($_POST["username"])) {
+    $username=$_POST["username"];
     $user_info = array();
     $get_info = "SELECT * FROM lib_User WHERE username='" . $username . "'";
     $get_info_result = $conn->query($get_info);
@@ -31,6 +31,7 @@ if(isset($_POST["username"])) {
     }
 }
 if(isset($_POST["rfid"])){
+    $rfid=$_POST["rfid"];
     $user_info = array();
     $get_info = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
     $get_info_result = $conn->query($get_info);
