@@ -141,8 +141,6 @@ class Books{
         // is the actual data object. As a third parameter we pass in our custom options.
         new Chartist.Bar(".ct-chart", data, options);
         </script>
-        
-        <script src="bar_graph_custom.js"></script>
         ';
     }
 }

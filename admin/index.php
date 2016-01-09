@@ -88,7 +88,7 @@ if(isset($_GET['index'])){
             $books->printAll();
         }else if($index_a[1] == "stats"){
             if(count($index_a) == 3){
-                $books->printStats("dag", (int) $index_a);
+                $books->printStats("dag", (int) $index_a[2]);
             }else{
                 $books->printStats("dag");
             }
@@ -106,7 +106,10 @@ if(isset($_GET['index'])){
     //Default page
 }
 
-echo "<script>var page = '".$index."';</script>";
+if(isset($index)){
+    echo "<script>var page = '".$index."';</script>";
+}
+
 ?>
 </div>
 </body>
