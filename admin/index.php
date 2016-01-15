@@ -37,15 +37,32 @@ if(isset($_GET['index'])){
     $index = $_GET['index'];
     $index_a = explode('/', $index);
     if($index_a[0] == "books"){
-        require 'books.class.php';
-        $books = new Books;
         if(!isset($index_a[1])){
-            $res['books'] = $books->printAll();
+            require 'list.class.php';
+            $list = new Lists($index_a[0]);
+            $res['books'] = $list->getList();
         }else if($index_a[1] == "stats"){
+            require 'stats.class.php';
+            //Preset variables if the server doesn't send something specific
+            $amount = array(
+                'm&aring;ned' => array(
+                    'amount' => 12,
+                    'multipler' => 2592000
+                ), 'dag' => array(
+                    'amount' => 30,
+                    'multipler' => 86400
+                ), 'time' => array(
+                    'amount' => 24,
+                    'multipler' => 3600
+                )
+            );
+            //Default stats page, without extra variables
+            $stats = new Stats($index_a[0]);
+            //$index_a[2] == book id
             if(count($index_a) == 3){
-                $res['stats'] = $books->printStats("dag", (int) $index_a[2]);
+                $res['stats'] = $stats->printStats();
             }else{
-                $res['stats'] = $books->printStats("dag");
+                $res['stats'] = $stats->printStats();
             }
         }else if($index_a[1] == "upload"){
             echo "upload book";
@@ -56,11 +73,18 @@ if(isset($_GET['index'])){
         }else if($index_a[1] == "modify"){
             echo "modify book";
         }
+    }else if($index_a[0] == "users"){
+        if(!isset($index_a[1])){
+            require 'list.class.php';
+            $list = new Lists($index_a[0]);
+            $res['users'] = $list->getList();
+        }
     }
 }else{
     //Default page
 }
 
 echo json_encode($res);
-
+//{"error":"","id":109342903234,"stats":{"stats":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,1,1,1,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0,1,0,0,0,0,0,0,1,0]}}}
+//{"error":"","id":109342903234,"stats":{"stats":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,1,1,1,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0,1,0,0,0,0,0,0,1,0]}}}
 ?>
