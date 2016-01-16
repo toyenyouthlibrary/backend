@@ -47,7 +47,8 @@ class Lists{
                     'name' => $list_item['username'],
                     'age' => 'whatever',
                     'registered' => 'some timestamp',
-                    'id' => $list_item['userID']
+                    'id' => $list_item['userID'],
+                    'rfid' => $list_item['rfid']
                 );
             }
         }

@@ -4,10 +4,11 @@ session_start();
 //Fech the user credentials from file that is not publicly available ^_^
 require '../../admin_credentials.php';
 
-
+//Initialize result array with the part that will always be the same
 $res = array();
 $res['error'] = '';
 
+//User verification
 $die = true;
 
 //User is not logged in yet, but might have sent the login details in the url
@@ -22,7 +23,7 @@ if(!isset($_POST['user']) || !isset($_POST['pass'])){
         );
     }
 }
-if(isset($_POST['id']) && $_POST['id'] == 109342903234){
+if(isset($_POST['id']) && exists_id($_POST['id'])){
     $die = false;
 }
 
