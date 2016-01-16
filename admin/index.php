@@ -56,12 +56,12 @@ if(isset($_GET['index'])){
                     'multipler' => 3600
                 )
             );
-            //Default stats page, without extra variables
-            $stats = new Stats($index_a[0]);
             //$index_a[2] == book id
             if(count($index_a) == 3){
+                $stats = new Stats($index_a[0], $index_a[2]);
                 $res['stats'] = $stats->printStats();
             }else{
+                $stats = new Stats($index_a[0]);
                 $res['stats'] = $stats->printStats();
             }
         }else if($index_a[1] == "upload"){
@@ -74,10 +74,23 @@ if(isset($_GET['index'])){
             echo "modify book";
         }
     }else if($index_a[0] == "users"){
+        //User pages
         if(!isset($index_a[1])){
             require 'list.class.php';
             $list = new Lists($index_a[0]);
             $res['users'] = $list->getList();
+        }else if($index_a[1] == "stats"){
+            require 'stats.class.php';
+            //Default stats page, without extra variables
+            
+            //$index_a[2] == book id
+            if(count($index_a) == 3){
+                $stats = new Stats($index_a[0], $index_a[2]);
+                $res['stats'] = $stats->printStats();
+            }else{
+                //As there are no "global" stats for users yet (haven't come up with a reason to have it, and what it would include)
+                $res['error'] = 'Ingen bruker er spesifisert.';
+            }
         }
     }
 }else{
@@ -85,6 +98,8 @@ if(isset($_GET['index'])){
 }
 
 echo json_encode($res);
-//{"error":"","id":109342903234,"stats":{"stats":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,1,1,1,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0,1,0,0,0,0,0,0,1,0]}}}
-//{"error":"","id":109342903234,"stats":{"stats":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,1,1,1,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0,1,0,0,0,0,0,0,1,0]}}}
+/*
+{"error":"","id":109342903234,"stats":{"totals":{"time":3582718,"outDates":12,"inDates":6},"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,6,1,2,1,0,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,1,0,0,0,0,0,0,0,1,0],"times":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,366213,0,2357287,110842,0,769066,-20690,0,0,0,0,0,0,0,0,0]}}
+{"error":"","id":109342903234,"stats":{"totals":{"time":1246121,"outDates":7,"inDates":5},"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,4,1,1,0,0,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,1,0],"times":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,366213,0,0,110842,0,769066,0,0,0,0,0,0,0,0,0,0]}}
+*/
 ?>

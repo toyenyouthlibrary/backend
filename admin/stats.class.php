@@ -1,7 +1,7 @@
 <?php
 
 class Stats{
-    function __construct($type, $display = array('multipler' => 86400,'amount' => 30), $id = 0){
+    function __construct($type, $id = 0, $display = array('multipler' => 86400,'amount' => 30)){
         //Connect to db
         require '../../koble_til_database.php';
         //Required variables
@@ -24,13 +24,17 @@ class Stats{
         //Calculate the max time ago that will be displayed (in seconds)
         $max_time_ago = time() - ($this->amount*$this->multipler);
         //Check if there is a specific user / book that is requested
-        $and_id_equals_userid = "";
+        $where_statement = "";
         if($this->id != 0){
-            $and_id_equals_userid = "AND userID = ".$this->id;
+            if($this->type == "users"){
+                $where_statement = "AND userID = ".$this->id;
+            }else if($this->type == "books"){
+                $where_statement = "AND bookID = ".$this->id;
+            }
         }
         //Query to find all relevant entries, by whether their outdates were matching the timeframe
         $get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM $this->tbl 
-                WHERE UNIX_TIMESTAMP(outDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(outDate) <= ".time()." ".$and_id_equals_userid;
+                WHERE UNIX_TIMESTAMP(outDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(outDate) <= ".time()." ".$where_statement;
         $get_books_qry = $this->conn->query($get_books);
         $total_outDates = 0;
         $total_time = 0;
@@ -47,7 +51,7 @@ class Stats{
         }
         //Get amount of inDates
         $get_books = "SELECT inDate FROM lib_User_Book 
-                WHERE UNIX_TIMESTAMP(inDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(inDate) <= ".time()." ".$and_id_equals_userid;
+                WHERE UNIX_TIMESTAMP(inDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(inDate) <= ".time()." ".$where_statement;
         $get_books_qry = $this->conn->query($get_books);
         $total_inDates = 0;
         if ($get_books_qry->num_rows > 0) {
