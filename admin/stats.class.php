@@ -1,7 +1,7 @@
 <?php
 
 class Stats{
-    function __construct($type, $id = 0, $display = array('multipler' => 86400,'amount' => 30)){
+    function __construct($type, $id = 0, $display = array('multipler' => 86400,'amount' => 30), $future_timelimit = 0){
         //Connect to db
         require '../../koble_til_database.php';
         //Required variables
@@ -13,6 +13,9 @@ class Stats{
         $this->id = $id;
         //Always same table because the sorting only depends on which rows to include
         $this->tbl = "lib_User_Book";
+        if($future_timelimit == 0){
+            $this->future_timelimit = time();
+        }
     }
     
     function printStats(){
@@ -34,7 +37,7 @@ class Stats{
         }
         //Query to find all relevant entries, by whether their outdates were matching the timeframe
         $get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM $this->tbl 
-                WHERE UNIX_TIMESTAMP(outDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(outDate) <= ".time()." ".$where_statement;
+                WHERE UNIX_TIMESTAMP(outDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(outDate) <= ".$this->future_timelimit." ".$where_statement;
         $get_books_qry = $this->conn->query($get_books);
         $total_outDates = 0;
         $total_time = 0;
@@ -51,7 +54,7 @@ class Stats{
         }
         //Get amount of inDates
         $get_books = "SELECT inDate FROM lib_User_Book 
-                WHERE UNIX_TIMESTAMP(inDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(inDate) <= ".time()." ".$where_statement;
+                WHERE UNIX_TIMESTAMP(inDate) > ".$max_time_ago." AND UNIX_TIMESTAMP(inDate) <= ".$this->future_timelimit." ".$where_statement;
         $get_books_qry = $this->conn->query($get_books);
         $total_inDates = 0;
         if ($get_books_qry->num_rows > 0) {
@@ -66,7 +69,7 @@ class Stats{
         
         $labels = array();
         for($i = 1; $i <= $this->amount; $i++){
-          $labels[] = $i;
+          $labels[] = "".$i;
         }
 
         $totals = array(
