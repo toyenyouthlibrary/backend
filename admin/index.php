@@ -11,7 +11,6 @@ $res['error'] = '';
 //User verification
 $die = true;
 
-//User is not logged in yet, but might have sent the login details in the url
 if(!isset($_POST['user']) || !isset($_POST['pass'])){
     
 }else{
@@ -90,6 +89,19 @@ if(isset($_GET['index'])){
             }else{
                 //As there are no "global" stats for users yet (haven't come up with a reason to have it, and what it would include)
                 $res['error'] = 'Ingen bruker er spesifisert.';
+            }
+        }
+    }else if($index_a[0] == "global"){
+        if(!isset($index_a[1])){
+            
+        }else if($index_a[1] == "history"){
+            if(!isset($index_a[2])){
+                //Display global history of lended books
+                require 'history.class.php';
+                $history = new History();
+                $res['history'] = $history->getHistory();
+            }else{
+                
             }
         }
     }
