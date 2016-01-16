@@ -1,10 +1,9 @@
 <?php
 require '../../koble_til_database.php';
 session_start();
-//Generate user credentials
-$users = array(
-    'admin' => 'cheesecake'
-);
+//Fech the user credentials from file that is not publicly available ^_^
+require '../../admin_credentials.php';
+
 
 $res = array();
 $res['error'] = '';
