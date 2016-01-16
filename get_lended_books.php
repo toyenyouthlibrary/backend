@@ -27,7 +27,11 @@ if ($get_user_info_result->num_rows > 0) {
                             'outDate' => $book['outDate'],
                             'inDate' => $book['inDate'],
                             'RFID' => $book_details['RFID'],
-                            'ISBN' => $book_details['ISBN']
+                            'ISBN' => $book_details['ISBN'],
+                            'title' => $book_details['title'],
+                            'author' => $book_details['author'],
+                            'type' => $book_details['type'],
+                            'language' => $book_details['language']
                         );
                     }
                 }
