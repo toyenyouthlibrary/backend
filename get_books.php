@@ -8,7 +8,7 @@ $error = array(
 );
 
 
-$get_books = "SELECT * FROM lib_Book WHERE bookID = 0";
+$get_books = "SELECT * FROM lib_Book";
 $get_books_qry = $conn->query($get_books);
 
 $res = array('error' => "");
@@ -18,7 +18,11 @@ if ($get_books_qry->num_rows > 0) {
         $res['books'][] = array(
             'id' => $book['bookID'],
             'RFID' => $book['RFID'],
-            'ISBN' => $book['ISBN']
+            'ISBN' => $book['ISBN'],
+            'title' => $book['title'],
+            'author' => $book['author'],
+            'type' => $book['type'],
+            'language' => $book['language']
         );
     }
     if($res == array('error' => "")){
