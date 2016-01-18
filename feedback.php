@@ -8,7 +8,8 @@ $error = array(
     'empty_comment' => 'Kan ikke lagre tomme kommentarer.',
     'not_int' => 'Stjernevurdering m&aring; sendes som et tall.',
     'nonexistant_user' => 'Den etterspurte brukeren finnes ikke.',
-    'nonexistant_book' => 'Den etterspurte boken finnes ikke.'
+    'nonexistant_book' => 'Den etterspurte boken finnes ikke.',
+    'failed_save' => 'Klarte ikke &aring; lagre feedback.'
 );
 
 
@@ -64,6 +65,16 @@ if($get_book_qry->num_rows > 0){
 }
 
 //Save the comment
+
+$save_feedback = "INSERT INTO lib_Feedback (userID, bookID, type, value) VALUES ('".$userid."', '".$bookid."', '".$type."', '".$value."')";
+$save_feedback_qry = $conn->query($save_feedback);
+if($save_feedback_qry === TRUE) {
+    //Success
+    j_die("");
+} else {
+    j_die($error['failed_save']);
+}
+
 
 
 
