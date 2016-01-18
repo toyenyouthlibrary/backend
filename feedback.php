@@ -4,17 +4,19 @@ require('../koble_til_database.php');
 session_start();
 
 $error = array(
+    'missing_data' => 'All n&oslash;dvendig info er ikke sendt.',
     'unknown_feedback' => 'Den etterspurte typen feedback er ikke akseptert.',
     'empty_comment' => 'Kan ikke lagre tomme kommentarer.',
     'not_int' => 'Stjernevurdering m&aring; sendes som et tall.',
+    'unaccepted_int' => 'Stjernevurderinger m&aring; v&aelig;re mellom 1 og 10.',
     'nonexistant_user' => 'Den etterspurte brukeren finnes ikke.',
     'nonexistant_book' => 'Den etterspurte boken finnes ikke.',
     'failed_save' => 'Klarte ikke &aring; lagre feedback.'
 );
 
 
-if(!isset($_POST['userid']) || !isset($_POST['bookid']) || !isset($_POST['type']) !isset($_POST['value'])){
-    j_die('All n&oslash;dvendig info er ikke sendt.')
+if(!isset($_POST['userid']) || !isset($_POST['bookid']) || !isset($_POST['type']) || !isset($_POST['value'])){
+    j_die($error['missing_data']);
 }
 $userid = $_POST['userid'];
 $bookid = $_POST['bookid'];
@@ -32,8 +34,12 @@ if($type == "comment"){
         j_die($error['empty_comment']);
     }
 }else{
-    if(!is_int($value)){
+    if(!is_numeric($value)){
         j_die($error['not_int']);
+    }else{
+        if(intval($value) > 10 || intval($value) < 1){
+            j_die($error['unaccepted_int']);
+        }
     }
 }
 
@@ -66,7 +72,7 @@ if($get_book_qry->num_rows > 0){
 
 //Save the comment
 
-$save_feedback = "INSERT INTO lib_Feedback (userID, bookID, type, value) VALUES ('".$userid."', '".$bookid."', '".$type."', '".$value."')";
+$save_feedback = "INSERT INTO lib_Feedback (userID, bookID, type, value, timestamp) VALUES ('".$userid."', '".$bookid."', '".$type."', '".$value."', '".time()."')";
 $save_feedback_qry = $conn->query($save_feedback);
 if($save_feedback_qry === TRUE) {
     //Success
