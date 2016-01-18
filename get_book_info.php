@@ -89,11 +89,40 @@ if ($get_book_qry->num_rows > 0) {
             }
         }
         
+        //Find the feedback of the book
+        $feedback = array('comments' => array(), 'stars' => array());
+        $get_feedback = "SELECT * FROM lib_Feedback WHERE bookID = '".$book['bookID']."'";
+        $get_feedback_qry = $conn->query($get_feedback);
+        if ($get_feedback_qry->num_rows > 0) {
+            while($feedback_res = $get_feedback_qry->fetch_assoc()){
+                $type = $feedback_res['type']."s";
+                $feedback[$type][] = array(
+                    'userid' => $feedback_res['userID'],
+                    'value' => $feedback_res['value'],
+                    'timestamp' => $feedback_res['timestamp']
+                );
+            }
+        }else{
+            //No feedback :O
+        }
+        //Calculate average amount of stars
+        $average_stars = 0;
+        if(count($feedback['stars']) > 0){
+            $total_stars = 0;
+            for($i = 0; $i < count($feedback['stars']); $i++){
+                $total_stars += intval($feedback['stars'][$i]['value']);
+            }
+            $average_stars = $total_stars / count($feedback['stars']);
+        }
+        $feedback['average_stars'] = $average_stars;
+        
+        //Print book info
         $res['book'] = array(
             'ISBN' => $book['ISBN'],
             'total_lend_time' => convertSecondsToReadable($total_lended_time),
             'total_lend_times' => count($borrowers),
-            'borrowers' => $borrowers_v2
+            'borrowers' => $borrowers_v2,
+            'feedback' => $feedback
         );
         echo json_encode($res);
     }else{
