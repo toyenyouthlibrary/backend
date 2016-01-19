@@ -5,8 +5,11 @@ session_start();
 require '../../admin_credentials.php';
 
 //Initialize result array with the part that will always be the same
-$res = array();
-$res['error'] = '';
+$res = array('error' => '');
+
+$error = array(
+    'failed_login' => 'Du m&aring; v&aelig;re logget inn for &aring; ha tilgang til denne siden.'
+);
 
 //User verification
 $die = true;
@@ -27,8 +30,7 @@ if(isset($_POST['id']) && exists_id($_POST['id'])){
 }
 
 if($die){
-    $res['error'] = 'Du m&aring; v&aelig;re logget inn for &aring; ha tilgang til denne siden.';
-    die(json_encode($res));
+    j_die($error['failed_login']);
 }
 $res['id'] = 109342903234;
 
@@ -110,8 +112,4 @@ if(isset($_GET['index'])){
 }
 
 echo json_encode($res);
-/*
-{"error":"","id":109342903234,"stats":{"totals":{"time":3582718,"outDates":12,"inDates":6},"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,6,1,2,1,0,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,1,0,0,0,0,0,0,0,1,0],"times":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,366213,0,2357287,110842,0,769066,-20690,0,0,0,0,0,0,0,0,0]}}
-{"error":"","id":109342903234,"stats":{"totals":{"time":1246121,"outDates":7,"inDates":5},"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"outDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,4,1,1,0,0,0,0,0,0,0,0,0,0],"inDates":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,1,0],"times":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,366213,0,0,110842,0,769066,0,0,0,0,0,0,0,0,0,0]}}
-*/
 ?>

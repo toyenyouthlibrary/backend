@@ -1,6 +1,5 @@
 <?php
 
-
 class Lists{
     function __construct($type, $order = null, $filter = ""){
         //Connect to db

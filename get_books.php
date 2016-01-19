@@ -26,12 +26,11 @@ if ($get_books_qry->num_rows > 0) {
         );
     }
     if($res == array('error' => "")){
-        $res['error'] = $error['no_books'];
+        j_die($error['no_books']);
     }
     echo json_encode($res);
 }else{
-    $res['error'] = $error['no_books'];
-    echo json_encode($res);
+    j_die($error['no_books']);
 }
 
 ?>

@@ -80,18 +80,4 @@ if($save_feedback_qry === TRUE) {
 } else {
     j_die($error['failed_save']);
 }
-
-
-
-
-//Function to kill the page
-function j_die($str){
-    die(
-        json_encode(
-            array(
-                'error' => $str
-            )
-        )
-    );
-}
 ?>

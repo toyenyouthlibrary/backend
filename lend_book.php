@@ -4,26 +4,22 @@ require('../koble_til_database.php');
 session_start();
 //init av variabler
 //l&aring;ne b&oslash;ker
-//errorvariabler
-$user_rfid_missing="Brukerens RFID mangler.";
-$book_rfid_missing="Bokens RFID mangler.";
-$userid_error="Klarte ikke &aring; finne bruker id i databasen.";
-$bookid_error="Klarte ikke &aring; finne bok id i databasen.";
-$error_bookid="Klarte ikke &aring; finne boken i databasen.";
-$error_userid="Klarte ikke &aring; finne brukeren i databasen.";
-$no_error="";
-$could_not_lend="Klarte ikke &aring; lagre l&aring;net.";
-$book_lended="Noen har allerede l&aring;nt denne boken.";
 
-//funksjon for &aring; d&oslash; :( med errormelding
-function error_die($error_message) {
-    $error_msg=array();
-    $error_msg["error"]=$error_message;
-    die(json_encode($error_msg));
-}
+$error = array(
+    'user_rfid_missing' => 'Brukerens RFID mangler.',
+    'book_rfid_missing' => 'Bokens RFID mangler.',
+    'userid_error' => 'Klarte ikke &aring, finne bruker id i databasen.',
+    'bookid_error' => 'Klarte ikke &aring, finne bok id i databasen.',
+    'error_bookid' => 'Klarte ikke &aring, finne boken i databasen.',
+    'error_userid' => 'Klarte ikke &aring, finne brukeren i databasen.',
+    'no_error' => '',
+    'could_not_lend' => 'Klarte ikke &aring, lagre l&aring,net.',
+    'book_lended' => 'Noen har allerede l&aring,nt denne boken.'
+);
+
 //her trenger vi forskjellige variable
-$user_rfid = (isset($_POST["user_rfid"]) ? $_POST["user_rfid"] : error_die($user_rfid_missing));
-$book_rfid = (isset($_POST["book_rfid"]) ? $_POST["book_rfid"] : error_die($book_rfid_missing));
+$user_rfid = (isset($_POST["user_rfid"]) ? $_POST["user_rfid"] : j_die($error['user_rfid_missing']));
+$book_rfid = (isset($_POST["book_rfid"]) ? $_POST["book_rfid"] : j_die($error['book_rfid_missing']));
 $userid=null;
 $bookid=null;
 
@@ -40,7 +36,7 @@ if ($get_user_id_result->num_rows > 0) {
         $userid=$row["userID"];
     }
 } else {
-    error_die($userid_error);
+    j_die($error['userid_error']);
 }
 
 //henter ut bokid med Rfid
@@ -51,31 +47,31 @@ if ($get_book_id_result->num_rows > 0) {
         $bookid=$row["bookID"];
     }
 } else {
-    error_die($bookid_error);
+    j_die($error['bookid_error']);
 }
 
 //dobbeltsikrer variablene
 if($bookid==null || $bookid==0){
-    die($error_bookid);
+    j_die($error['error_bookid']);
 }
 if($userid==null || $userid==0){
-    die($error_userid);
+    j_die($error['error_userid']);
 }
 
 //sjekker om boka allerede er leid ut (egt bare for dev)
 $check_book = "SELECT * FROM lib_User_Book WHERE bookID='".$bookid."' AND inDate IS NULL";
 $check_book_result = $conn->query($check_book);
 if ($check_book_result->num_rows > 0) {
-    error_die($book_lended);
+    j_die($error['book_lended']);
 }
 
 //alt er klart for &aring; leie boka
 $lend_book = "INSERT INTO lib_User_Book(userID, outDate, bookID) VALUES ('".$userid."', '".$date."', '".$bookid."')";
     $lend_book_result = $conn->query($lend_book);
 if ($lend_book_result === TRUE) {
-    error_die($no_error);
+    j_die($error['no_error']);
 } else {
-    error_die($could_not_lend);
+    j_die($error['could_not_lend']);
 
 }
 

@@ -3,7 +3,9 @@
 require('../koble_til_database.php');
 session_start();
 
-$nonexistant_user = 'Den etterspurte brukeren finnes ikke i v&aring;re systemer.';
+$error = array(
+    'nonexistant_user' => 'Den etterspurte brukeren finnes ikke i v&aring;re systemer.'
+);
 
 $username = $_POST['username'];
 
@@ -42,12 +44,10 @@ if ($get_user_info_result->num_rows > 0) {
         echo json_encode($res);
     }
 } else {
-    $res['error'] = $nonexistant_user;
-    die(json_encode($res));
+    j_die($error['nonexistant_user']);
 }
 if(!isset($get_books)){
-    $res['error'] = $nonexistant_user;
-    die(json_encode($res));
+    j_die($error['nonexistant_user']);
 }
 
 ?>

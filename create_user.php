@@ -11,7 +11,13 @@ $rfid = (isset($_POST["rfid"]) ? $_POST["rfid"] : NULL);
 $firstname = (isset($_POST["firstname"]) ? $_POST["firstname"] : NULL);
 $email = (isset($_POST["email"]) ? $_POST["email"] : NULL);
 
-$error_array["error"]="";
+$error = array(
+    'username_in_use' => 'Brukernavnet er allerede tatt.',
+    'rfid_in_use' => 'Det finnes allerede en bruker med den RFIDen.',
+    'failed_to_save_contact' => 'Klarte ikke &aring; lagre kontaktinformasjon.',
+    'failed_to_link_contact' => 'Klarte ikke &aring; linke kontaktinformasjonen med brukeren.',
+    'failed_to_save_user' => 'Klarte ikke &aring; lagre brukeren.'
+);
 
 /*
  * variabelen $conn er hentet fra koble_til_database.php
@@ -22,8 +28,7 @@ $test_uname = "SELECT * FROM lib_User WHERE username='" . $username . "'";
 $test_uname_result = $conn->query($test_uname);
 if ($test_uname_result->num_rows > 0) {
     //det finnes mer enn 0 rader, ergo finnes brukernavnet
-    $error_array["error"]="Brukernavnet er allerede tatt.";
-    die(json_encode($error_array)); //errorkode for at brukernavn er tatt
+    j_die($error['username_in_use']); //errorkode for at brukernavn er tatt
 }
 
 
@@ -32,8 +37,7 @@ $test_email = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
 $test_email_result = $conn->query($test_email);
 if ($test_email_result->num_rows > 0) {
     //det finnes mer enn 0 rader, ergo finnes emailen allerede
-    $error_array["error"]="Det finnes allerede en bruker med den RFIDen.";
-    die(json_encode($error_array)); //kode for RFID tatt
+    j_die($error['rfid_in_use']); //kode for RFID tatt
 }
 
 
@@ -50,9 +54,7 @@ if(!empty($firstname) || !empty($email)){
         $userid=$conn->insert_id;
 
     }else{
-        $error_array["error"]="Klarte ikke &aring; registrere brukeren, vennligst pr&oslash;v igjen senere.";
-        die(json_encode($error_array));
-
+        j_die($error['failed_to_save_user']);
     }
 
     //lager en ny input i lib_Contact med informasjonen gitt tidligere
@@ -62,11 +64,8 @@ if(!empty($firstname) || !empty($email)){
     if ($insert_contact_result===TRUE) {
         //henter sist satte auto-id og setter den lik contact id
         $contactid=$conn->insert_id;
-
     }else{
-        $error_array["error"]="Klarte ikke &aring; lagre kontaktinformasjon.";
-        die(json_encode($error_array));
-
+        j_die($error['failed_to_save_contact']);
     }
 
     //dobbeltsikring
@@ -77,12 +76,9 @@ if(!empty($firstname) || !empty($email)){
             "INSERT INTO lib_User_Contact (contactID, userID) VALUES('" . $contactid . "', '" . $userid . "')";
         $insert_contact_user_result = $conn->query($insert_contact_user);
         if ($insert_contact_user_result === TRUE) {
-            $error_array["error"]="";
-            die(json_encode($error_array));
+            j_die("");
         } else {
-            $error_array["error"]="Klarte ikke &aring; linke kontaktinformasjonen med brukeren.";
-            die(json_encode($error_array));
-
+            j_die($error['failed_to_link_contact']);
         }
 
     }
@@ -95,14 +91,9 @@ else{
         "INSERT INTO lib_User (username, rfid) VALUES('".$username."', '".$rfid."')";
     $insert_user_result = $conn->query($insert_user);
     if ($insert_user_result===TRUE) {
-        $error_array=array();
-
-        $error_array["error"]="";
-        die(json_encode($error_array));
+        j_die("");
     }else{
-        $error_array["error"]="Klarte ikke &aring; lagre brukeren.";
-        die(json_encode($error_array));
-
+        j_die($error['failed_to_save_user']);
     }
 }
 

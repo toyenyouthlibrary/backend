@@ -127,13 +127,11 @@ if ($get_book_qry->num_rows > 0) {
         echo json_encode($res);
     }else{
         //Query failed (nonexistant book or SQL error)
-        $res['error'] = $error['nonexistant_book'];
-        die(json_encode($res));
+        j_die($error['nonexistant_book']);
     }
 } else {
     //Query failed (nonexistant book or SQL error)
-    $res['error'] = $error['nonexistant_book'];
-    die(json_encode($res));
+    j_die($error['nonexistant_book']);
 }
 
 function convertSecondsToReadable($seconds){

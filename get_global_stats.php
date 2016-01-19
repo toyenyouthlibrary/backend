@@ -3,9 +3,11 @@
 require('../koble_til_database.php');
 
 //init av variabler
-$res = array();
-$res["error"]="";
+$res = array('error' => '');
 
+$error = array(
+    'no_lended_books' => 'Ingen b&oslash;ker er utl&aring;nt.'
+);
 
 $get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book";
 $get_books_qry = $conn->query($get_books);
@@ -22,8 +24,7 @@ if ($get_books_qry->num_rows > 0) {
     }
 }else{
     //echo "No books borrowed";
-    $res['error'] = "Ingen b&oslash;ker er utl&aring;nt.";
-    die(json_encode($res));
+    j_die($error['no_lended_books']);
 }
 
 $res["total_time_lended"] = convertSecondsToReadable($total_time);

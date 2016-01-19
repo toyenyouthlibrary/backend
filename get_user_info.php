@@ -3,8 +3,13 @@
 require('../koble_til_database.php');
 
 //init av variabler
-$error_array["error"]="";
 $user_info = array();
+
+$error = array(
+    'nonexistant_user' => 'Brukeren %username% finnes ikke i v&aring;re systemer.',
+    'nonexistant_rfid' => 'Ingen registrerte brukere med denne RFIDen.',
+    'no_userinfo' => 'Klarte ikke &aring; finne informasjon om brukeren.',
+);
 /*
  * variabelen $conn er hentet fra koble_til_database.php
  */
@@ -26,8 +31,7 @@ if(isset($_POST["username"])) {
 
         }
     } else {
-        $error_array["error"] = "Brukeren ".$username." finnes ikke i v&aring;re systemer.";
-        die(json_encode($error_array));
+        j_die(str_replace('%username%', $username, $error['nonexistant_user']));
     }
 }
 if(isset($_POST["rfid"])){
@@ -42,14 +46,12 @@ if(isset($_POST["rfid"])){
             $user_info["username"] = $row["username"];
         }
     } else {
-        $error_array["error"] = "Ingen registrerte brukere med denne RFIDen";
-        die(json_encode($error_array));
+        j_die($error['nonexistant_rfid']);
     }
 }
 
 if(empty($user_info["userID"])){
-    $user_info["error"]="Klarte ikke &aring; finne informasjon om brukeren.";
-    die(json_encode($user_info));
+    j_die($error['no_userinfo']);
 }
 
 $get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book WHERE userID='" . $user_info['userID'] . "'";
