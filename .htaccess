@@ -1,0 +1,2 @@
+ErrorDocument 404 '{"error":"Den etterspurte siden finnes ikke."}'
+ErrorDocument 403 '{"error":"Du har ikke tilgang til &aring; se denne siden"}'
