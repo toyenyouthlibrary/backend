@@ -15,11 +15,11 @@ $error = array(
 );
 
 
-if(!isset($_POST['userid']) || !isset($_POST['bookid']) || !isset($_POST['type']) || !isset($_POST['value'])){
+if(!isset($_POST['user_rfid']) || !isset($_POST['book_rfid']) || !isset($_POST['type']) || !isset($_POST['value'])){
     j_die($error['missing_data']);
 }
-$userid = $_POST['userid'];
-$bookid = $_POST['bookid'];
+$user_rfid = $_POST['user_rfid'];
+$book_rfid = $_POST['book_rfid'];
 $type = $_POST['type'];
 $value = $_POST['value'];
 
@@ -44,7 +44,7 @@ if($type == "comment"){
 }
 
 //Verify that the user exists
-$get_user = "SELECT userID FROM lib_User WHERE userID = '" . $userid . "'";
+$get_user = "SELECT userID FROM lib_User WHERE rfid = '" . $user_rfid . "'";
 $get_user_qry = $conn->query($get_user);
 
 if($get_user_qry->num_rows > 0){
@@ -58,7 +58,7 @@ if($get_user_qry->num_rows > 0){
 }
 
 //Verify that the book exists
-$get_book = "SELECT * FROM lib_Book WHERE bookID = '".$bookid."'";
+$get_book = "SELECT * FROM lib_Book WHERE RFID = '".$book_rfid."'";
 $get_book_qry = $conn->query($get_book);
 if($get_book_qry->num_rows > 0){
     if($book = $get_book_qry->fetch_assoc()){
@@ -72,9 +72,9 @@ if($get_book_qry->num_rows > 0){
 
 //Save the comment
 
-$save_feedback = "INSERT INTO lib_Feedback (userID, bookID, type, value, timestamp) VALUES ('".$userid."', '".$bookid."', '".$type."', '".$value."', '".time()."')";
+$save_feedback = "INSERT INTO lib_Feedback (user_rfid, book_rfid, type, value, timestamp) VALUES ('".$user_rfid."', '".$book_rfid."', '".$type."', '".$value."', '".time()."')";
 $save_feedback_qry = $conn->query($save_feedback);
-if($save_feedback_qry === TRUE) {
+if($save_feedback_qry === TRUE){
     //Success
     j_die("");
 } else {
