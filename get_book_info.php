@@ -4,8 +4,13 @@ require('../koble_til_database.php');
 session_start();
 
 $error = array(
-    'nonexistant_book' => 'Boken er ikke registrert.'
+    'nonexistant_book' => 'Boken er ikke registrert.',
+    'missing_variables' => 'Ingen rfid mottatt.'
 );
+
+if(!isset($_POST['rfid'])){
+    j_die($error['missing_variables']);
+}
 
 $rfid = $_POST['rfid'];
 
@@ -91,13 +96,13 @@ if ($get_book_qry->num_rows > 0) {
         
         //Find the feedback of the book
         $feedback = array('comments' => array(), 'stars' => array());
-        $get_feedback = "SELECT * FROM lib_Feedback WHERE bookID = '".$book['bookID']."'";
+        $get_feedback = "SELECT * FROM lib_Feedback WHERE book_rfid = '".$book['RFID']."'";
         $get_feedback_qry = $conn->query($get_feedback);
         if ($get_feedback_qry->num_rows > 0) {
             while($feedback_res = $get_feedback_qry->fetch_assoc()){
                 $type = $feedback_res['type']."s";
                 $feedback[$type][] = array(
-                    'userid' => $feedback_res['userID'],
+                    'user_rfid' => $feedback_res['user_rfid'],
                     'value' => $feedback_res['value'],
                     'timestamp' => $feedback_res['timestamp']
                 );
