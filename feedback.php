@@ -71,8 +71,9 @@ if($get_book_qry->num_rows > 0){
 }
 
 //Save the comment
+$date= (new DateTime())->format('Y-m-d H:i:s');
 
-$save_feedback = "INSERT INTO lib_Feedback (user_rfid, book_rfid, type, value, timestamp) VALUES ('".$user_rfid."', '".$book_rfid."', '".$type."', '".$value."', '".time()."')";
+$save_feedback = "INSERT INTO lib_Feedback (user_rfid, book_rfid, type, value, timestamp) VALUES ('".$user_rfid."', '".$book_rfid."', '".$type."', '".$value."', '".$date."')";
 $save_feedback_qry = $conn->query($save_feedback);
 if($save_feedback_qry === TRUE){
     //Success

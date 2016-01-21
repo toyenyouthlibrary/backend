@@ -40,6 +40,7 @@ if ($test_email_result->num_rows > 0) {
     j_die($error['rfid_in_use']); //kode for RFID tatt
 }
 
+$date= (new DateTime())->format('Y-m-d H:i:s');
 
 //oppretter kontaktinformasjon og bruker, om kontaktinfo er satt.
 if(!empty($firstname) || !empty($email)){
@@ -47,7 +48,7 @@ if(!empty($firstname) || !empty($email)){
     $contactid=0;
 //setter inn i tabellen
     $insert_user=
-        "INSERT INTO lib_User (username, rfid) VALUES('".$username."', '".$rfid."')";
+        "INSERT INTO lib_User (username, rfid, registered) VALUES('".$username."', '".$rfid."', '".$date."')";
     $insert_user_result = $conn->query($insert_user);
     if ($insert_user_result===TRUE) {
         //henter auto iden som ble satt
@@ -88,7 +89,7 @@ if(!empty($firstname) || !empty($email)){
 else{
     //oppretter en standardbruker, uten kontaktinfo
     $insert_user=
-        "INSERT INTO lib_User (username, rfid) VALUES('".$username."', '".$rfid."')";
+        "INSERT INTO lib_User (username, rfid, registered) VALUES('".$username."', '".$rfid."', '".$date."')";
     $insert_user_result = $conn->query($insert_user);
     if ($insert_user_result===TRUE) {
         j_die("");
