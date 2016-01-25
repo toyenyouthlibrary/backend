@@ -4,20 +4,32 @@ require('../koble_til_database.php');
 session_start();
 //init av variabler
 //for &aring; lage en enkel bruker
-$username = (isset($_POST["username"]) ? $_POST["username"] : NULL);
-$rfid = (isset($_POST["rfid"]) ? $_POST["rfid"] : NULL);
 
-//valgfri kontaktinformasjon
-$firstname = (isset($_POST["firstname"]) ? $_POST["firstname"] : NULL);
-$email = (isset($_POST["email"]) ? $_POST["email"] : NULL);
 
 $error = array(
+    'missing_info' => 'All n&oslash;dvendig informasjon er ikke sendt.',
     'username_in_use' => 'Brukernavnet er allerede tatt.',
     'rfid_in_use' => 'Det finnes allerede en bruker med den RFIDen.',
     'failed_to_save_contact' => 'Klarte ikke &aring; lagre kontaktinformasjon.',
     'failed_to_link_contact' => 'Klarte ikke &aring; linke kontaktinformasjonen med brukeren.',
     'failed_to_save_user' => 'Klarte ikke &aring; lagre brukeren.'
 );
+
+if(!isset($_POST['username']) || !isset($_POST['rfid']) || !isset($_POST['name']) || !isset($_POST['age']) || 
+        !isset($_POST['sex']) || !isset($_POST['class']) || !isset($_POST['school']) || !isset($_POST['password']) || 
+        !isset($_POST['address'])){
+    j_die($error['missing_info']);
+}
+
+$username = $_POST["username"];
+$rfid = $_POST["rfid"];
+$name = $_POST['name']; 
+$age = $_POST['age']; 
+$sex = $_POST['sex']; 
+$class = $_POST['class']; 
+$school = $_POST['school']; 
+$password = $_POST['password']; 
+$address = $_POST['address'];
 
 /*
  * variabelen $conn er hentet fra koble_til_database.php
@@ -42,60 +54,17 @@ if ($test_email_result->num_rows > 0) {
 
 $date= (new DateTime())->format('Y-m-d H:i:s');
 
-//oppretter kontaktinformasjon og bruker, om kontaktinfo er satt.
-if(!empty($firstname) || !empty($email)){
-    $userid=0;
-    $contactid=0;
-//setter inn i tabellen
-    $insert_user=
-        "INSERT INTO lib_User (username, rfid, registered) VALUES('".$username."', '".$rfid."', '".$date."')";
-    $insert_user_result = $conn->query($insert_user);
-    if ($insert_user_result===TRUE) {
-        //henter auto iden som ble satt
-        $userid=$conn->insert_id;
 
-    }else{
-        j_die($error['failed_to_save_user']);
-    }
 
-    //lager en ny input i lib_Contact med informasjonen gitt tidligere
-    $insert_contact=
-        "INSERT INTO lib_Contact (firstname, email) VALUES('".$firstname."', '".$email."')";
-    $insert_contact_result= $conn->query($insert_contact);
-    if ($insert_contact_result===TRUE) {
-        //henter sist satte auto-id og setter den lik contact id
-        $contactid=$conn->insert_id;
-    }else{
-        j_die($error['failed_to_save_contact']);
-    }
-
-    //dobbeltsikring
-
-    if($userid!=0 && $contactid!=0) {
-        //setter ett nytt element i mange til mange-mellomtabellen med informasjonen hentet ut/generert
-        $insert_contact_user =
-            "INSERT INTO lib_User_Contact (contactID, userID) VALUES('" . $contactid . "', '" . $userid . "')";
-        $insert_contact_user_result = $conn->query($insert_contact_user);
-        if ($insert_contact_user_result === TRUE) {
-            j_die("");
-        } else {
-            j_die($error['failed_to_link_contact']);
-        }
-
-    }
-
-    //end
-}
-else{
-    //oppretter en standardbruker, uten kontaktinfo
-    $insert_user=
-        "INSERT INTO lib_User (username, rfid, registered) VALUES('".$username."', '".$rfid."', '".$date."')";
-    $insert_user_result = $conn->query($insert_user);
-    if ($insert_user_result===TRUE) {
-        j_die("");
-    }else{
-        j_die($error['failed_to_save_user']);
-    }
+//oppretter en standardbruker, uten ekstra kontaktinfo
+$insert_user=
+    "INSERT INTO lib_User (username, name, age, sex, class, school, password, address, rfid, registered) VALUES
+    ('".utf8_encode($username)."', '".$name."', '".$age."', '".$sex."', '".$class."', '".$school."', '".$password."', '".$address."', '".$rfid."', '".$date."')";
+$insert_user_result = $conn->query($insert_user);
+if ($insert_user_result===TRUE) {
+    j_die("");
+}else{
+    j_die($error['failed_to_save_user']);
 }
 
 

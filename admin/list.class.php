@@ -42,12 +42,22 @@ class Lists{
                 );
             }else if($this->type == "users"){
                 //Formatting of the result of user list
+                $approved = false;
+                if($list_item['approved_date'] != null){
+                    $approved = true;
+                }
                 $res[] = array(
-                    'name' => $list_item['username'],
-                    'age' => 'whatever',
-                    'registered' => 'some timestamp',
+                    'username' => $list_item['username'],
+                    'age' => $list_item['age'],
+                    'name' => $list_item['name'],
+                    'class' => $list_item['class'],
+                    'school' => $list_item['school'],
+                    'sex' => $list_item['sex'],
+                    'address' => $list_item['address'],
+                    'registered' => $list_item['registered'],
                     'id' => $list_item['userID'],
-                    'rfid' => $list_item['rfid']
+                    'rfid' => $list_item['rfid'],
+                    'approved' => $approved
                 );
             }
         }
