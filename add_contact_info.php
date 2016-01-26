@@ -8,7 +8,8 @@ $error = array(
     'nonexistant_user' => 'Den etterspurte brukeren finnes ikke',
     'failed_to_save_contact' => 'Klarte ikke &aring; lagre kontaktinformasjonen.',
     'failed_to_get_contact' => 'Klarte ikke &aring; finne kontaktinformasjonen.',
-    'failed_to_get_user' => 'Klarte ikke &aring; finne brukerinformasjonen.'
+    'failed_to_get_user' => 'Klarte ikke &aring; finne brukerinformasjonen.',
+    'failed_to_save_contact_info' => 'Klarte ikke &aring; linke kontaktinformasjonen med brukeren.'
 );
 
 if(!isset($_POST['username']) || !isset($_POST['phone']) || !isset($_POST['email'])){
@@ -53,7 +54,12 @@ $get_contact_qry = $conn->query($get_contact);
 if($get_contact_qry->num_rows > 0){
     if($contact = $get_contact_qry->fetch_assoc()){
         $insert_contact = "INSERT INTO lib_User_Contact (contactID, userID) VALUES ('".$contact['contactID']."', '".$userID."')";
-        j_die("");
+        $insert_contact_qry = $conn->query($insert_contact_qry);
+        if($insert_contact_qry === TRUE){
+            j_die("");
+        }else{
+            j_die($error['failed_to_save_contact_info']);
+        }
     }else{
         j_die($error['failed_to_get_contact']);
     }
