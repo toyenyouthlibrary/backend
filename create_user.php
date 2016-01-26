@@ -15,16 +15,17 @@ $error = array(
     'failed_to_save_user' => 'Klarte ikke &aring; lagre brukeren.'
 );
 
-if(!isset($_POST['username']) || !isset($_POST['rfid']) || !isset($_POST['name']) || !isset($_POST['age']) || 
+if(!isset($_POST['username']) || !isset($_POST['rfid']) || !isset($_POST['firstname']) || !isset($_POST['birth']) || 
         !isset($_POST['sex']) || !isset($_POST['class']) || !isset($_POST['school']) || !isset($_POST['password']) || 
-        !isset($_POST['address'])){
+        !isset($_POST['address']) || !isset($_POST['lastname'])){
     j_die($error['missing_info']);
 }
 
 $username = $_POST["username"];
 $rfid = $_POST["rfid"];
-$name = $_POST['name']; 
-$age = $_POST['age']; 
+$firstname = $_POST['firstname']; 
+$lastname = $_POST['lastname']; 
+$birth = $_POST['birth']; 
 $sex = $_POST['sex']; 
 $class = $_POST['class']; 
 $school = $_POST['school']; 
@@ -58,8 +59,8 @@ $date= (new DateTime())->format('Y-m-d H:i:s');
 
 //oppretter en standardbruker, uten ekstra kontaktinfo
 $insert_user=
-    "INSERT INTO lib_User (username, name, age, sex, class, school, password, address, rfid, registered) VALUES
-    ('".utf8_encode($username)."', '".$name."', '".$age."', '".$sex."', '".$class."', '".$school."', '".$password."', '".$address."', '".$rfid."', '".$date."')";
+    "INSERT INTO lib_User (username, firstname, lastname, birth, sex, class, school, password, address, rfid, registered) VALUES
+    ('".utf8_encode($username)."', '".$firstname."', '".$lastname."', '".$birth."', '".$sex."', '".$class."', '".$school."', '".$password."', '".$address."', '".$rfid."', '".$date."')";
 $insert_user_result = $conn->query($insert_user);
 if ($insert_user_result===TRUE) {
     j_die("");
