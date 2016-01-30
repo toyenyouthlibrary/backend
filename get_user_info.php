@@ -28,6 +28,15 @@ if(isset($_POST["username"])) {
             $user_info["rfid"] = $row["rfid"];
             $user_info["userID"] = $row["userID"];
             $user_info["username"] = $row["username"];
+            $user_info["firstname"] = $row["firstname"];
+            $user_info["lastname"] = $row["lastname"];
+            $user_info["birth"] = $row["birth"];
+            $user_info["sex"] = $row["sex"];
+            $user_info["class"] = $row["class"];
+            $user_info["school"] = $row["school"];
+            $user_info["address"] = $row["address"];
+            $user_info["registered"] = $row["registered"];
+            $user_info["approved_date"] = $row["approved_date"];
 
         }
     } else {
@@ -44,6 +53,15 @@ if(isset($_POST["rfid"])){
             $user_info["rfid"] = $row["rfid"];
             $user_info["userID"] = $row["userID"];
             $user_info["username"] = $row["username"];
+            $user_info["firstname"] = $row["firstname"];
+            $user_info["lastname"] = $row["lastname"];
+            $user_info["birth"] = $row["birth"];
+            $user_info["sex"] = $row["sex"];
+            $user_info["class"] = $row["class"];
+            $user_info["school"] = $row["school"];
+            $user_info["address"] = $row["address"];
+            $user_info["registered"] = $row["registered"];
+            $user_info["approved_date"] = $row["approved_date"];
         }
     } else {
         j_die($error['nonexistant_rfid']);
@@ -84,7 +102,7 @@ if ($test_uname_result->num_rows > 0) {
 
             while($row2 = $test_uname_result2->fetch_assoc()) {
 
-                $user_info["firstname"]=$row2["firstname"]; //$user_info["contact_".$usernr]["firstname"]=$row2["firstname"]
+                $user_info["phone"]=$row2["phone"]; //$user_info["contact_".$usernr]["firstname"]=$row2["firstname"]
                 $user_info["email"]=$row2["email"]; // $user_info["contact_".$usernr]["email"]=$row2["email"];
                 $usernr++;
             }
