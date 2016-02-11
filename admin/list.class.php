@@ -3,7 +3,7 @@
 class Lists{
     function __construct($type, $order = null, $filter = ""){
         //Connect to db
-        require '../../koble_til_database.php';
+        require '../../../koble_til_database.php';
         //Required variables
         $this->conn = $conn;
         $this->type = $type;

@@ -1,6 +1,6 @@
 <?php
 //kobler til database
-require('../koble_til_database.php');
+require('../../koble_til_database.php');
 session_start();
 //init av variabler
 //for &aring; lage en enkel bruker

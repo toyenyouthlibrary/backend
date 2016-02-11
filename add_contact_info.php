@@ -1,6 +1,6 @@
 <?php
 //kobler til database
-require('../koble_til_database.php');
+require('../../koble_til_database.php');
 session_start();
 
 $error = array(
@@ -66,6 +66,5 @@ if($get_contact_qry->num_rows > 0){
 }else{
     j_die($error['failed_to_get_contact']);
 }
-
 
 ?>

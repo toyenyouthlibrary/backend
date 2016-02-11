@@ -3,7 +3,7 @@
 class Stats{
     function __construct($type, $id = 0, $display = array('multipler' => 86400,'amount' => 30), $future_timelimit = 0){
         //Connect to db
-        require '../../koble_til_database.php';
+        require '../../../koble_til_database.php';
         //Required variables
         $this->conn = $conn;
         

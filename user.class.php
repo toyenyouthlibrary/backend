@@ -5,7 +5,7 @@ class User{
     private $info = array();
     
     function __construct($user, $pass){
-        require('../koble_til_database.php');
+        require('../../koble_til_database.php');
         $this->conn = $conn;
         
         $get_user = "SELECT * FROM lib_User WHERE LOWER(username) = LOWER('" . $user . "') AND password = '".$pass."'";

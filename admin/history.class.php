@@ -3,7 +3,7 @@
 class History{
     function __construct(){
         //Connect to db
-        require '../../koble_til_database.php';
+        require '../../../koble_til_database.php';
         //Required variables
         $this->conn = $conn;
         

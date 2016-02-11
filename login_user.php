@@ -1,5 +1,5 @@
 <?php
-require('../koble_til_database.php');
+require('../../koble_til_database.php');
 session_start();
 if(!isset($_GET['rfid'])){
     j_die("Mangler n&oslash;dvendige variabler.");

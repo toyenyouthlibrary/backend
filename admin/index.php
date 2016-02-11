@@ -1,8 +1,8 @@
 <?php
-require '../../koble_til_database.php';
+require '../../../koble_til_database.php';
 session_start();
 //Fech the user credentials from file that is not publicly available ^_^
-require '../../admin_credentials.php';
+require '../../../admin_credentials.php';
 
 //Initialize result array with the part that will always be the same
 $res = array('error' => '');

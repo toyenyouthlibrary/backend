@@ -1,6 +1,6 @@
 <?php
 //kobler til database
-require('../koble_til_database.php');
+require('../../koble_til_database.php');
 
 //init av variabler
 $res = array('error' => '');
