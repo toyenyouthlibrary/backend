@@ -5,9 +5,6 @@ session_start();
 //init av variabler
 
 $error = array(
-    'missing_info' => 'All n&oslash;dvendig informasjon er ikke sendt.',
-    'empty_info' => 'Alle felter m&aring; fylles inn.',
-    'missing_elegible' => 'Alle felter er ikke fylt inn, eller det er en feil i databasen.',
     'inexistant_user' => 'Brukeren finnes ikke.',
     'failed_to_update' => 'Klarte ikke &aring; lagre pinkoden.'
 );
@@ -24,26 +21,7 @@ $post_vars = array(
 );
 
 //Array that contains all the post information
-$vars = array();
-//Check for invalid variables
-foreach($post_vars['obligatory'] as $obligatory_var){
-    if(!isset($_POST[$obligatory_var])){
-        j_die($error['missing_info']);
-    }else if($_POST[$obligatory_var] == ""){
-        j_die($error['empty_info']);
-    }
-    $vars[$obligatory_var] = $_POST[$obligatory_var];
-}
-foreach($post_vars['choose_one'] as $elegible_var){
-    if(isset($_POST[$elegible_var])){
-        if($_POST[$elegible_var] != ""){
-            $vars['elegible'] = array($elegible_var, $_POST[$elegible_var]);
-        }
-    }
-}
-if(!isset($vars['elegible'])){
-    j_die($error['missing_elegible']);
-}
+$vars = $post->verify($post_vars);
 
 //Can be changed later on to go straight to the UPDATE query, because it won't do nothing if the user doesn't exist...
 $user_check = "SELECT userID FROM lib_User WHERE " . $vars['elegible'][0] . " = '" . $vars['elegible'][1] . "'";
