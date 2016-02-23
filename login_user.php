@@ -1,20 +1,55 @@
 <?php
 require('../../koble_til_database.php');
 session_start();
-if(!isset($_GET['rfid'])){
-    j_die("Mangler n&oslash;dvendige variabler.");
-}
-$rfid = $_GET["rfid"];
 
-$get_book = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
-$get_book_info_result = $conn->query($get_book);
+$error = array(
+    'unknown_rfid' => 'Den skannede enheten er ikke registrert.',
+    'wrong_pin' => 'Feil PIN-kode.'
+);
 
-$books=array("FALSE");
-if ($get_book_info_result->num_rows > 0) {
-    // output data of each row
-    if($row = $get_book_info_result->fetch_assoc()){
-        $books[0] = "TRUE";
+$post_vars = array(
+    'obligatory' => array(
+        'rfid',
+        'pin'
+    )
+);
+
+//Array that contains all the post information
+$vars = $post->verify($post_vars);
+
+$get_user = "SELECT userID, pin FROM lib_User WHERE rfid = '" . $vars['rfid'] . "'";
+$get_user_qry = $conn->query($get_user);
+
+if ($get_user_qry->num_rows > 0) {
+    if($user = $get_user_qry->fetch_assoc()){
+        if($vars['pin'] == $user['pin']){
+            $sess = random_string();
+            $_SESSION[$sess] = $user["userID"];
+            die(
+                json_encode(
+                    array(
+                        'error' => '',
+                        'id' => $sess . ""
+                    )
+                )
+            );
+        }else{
+            j_die($error['wrong_pin']);
+        }
     }
 }
-die(json_encode($books));
+
+function random_string(){
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $str = '';
+    for ($i = 0; $i < 20; $i++) {
+        $str .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $str;
+}
+
+//That the code reaches this point will only occur if 
+j_die($error['unknown_rfid']);
+
 ?>

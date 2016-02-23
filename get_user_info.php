@@ -1,84 +1,73 @@
 <?php
 //kobler til database
 require('../../koble_til_database.php');
+session_start();
 
-//init av variabler
-$user_info = array();
-
+//Error messages
 $error = array(
     'nonexistant_user' => 'Brukeren %username% finnes ikke i v&aring;re systemer.',
     'nonexistant_rfid' => 'Ingen registrerte brukere med denne RFIDen.',
     'no_userinfo' => 'Klarte ikke &aring; finne informasjon om brukeren.',
+    
+    'failed_login' => 'Klarte ikke &aring; logge inn brukeren.',
+    'missing_variables' => 'Login informasjonen har ikke blitt sendt med.'
 );
-/*
- * variabelen $conn er hentet fra koble_til_database.php
- */
 
-//sjekker om variablene er satt
-
-//henter info og pusher det inn i ett array
-
-if(isset($_POST["username"])) {
-    $username=$_POST["username"];
-    $user_info = array();
-    $get_info = "SELECT * FROM lib_User WHERE username='" . $username . "'";
-    $get_info_result = $conn->query($get_info);
-    if ($get_info_result->num_rows > 0) {
-        while ($row = $get_info_result->fetch_assoc()) {
-            $user_info["rfid"] = $row["rfid"];
-            $user_info["userID"] = $row["userID"];
-            $user_info["username"] = $row["username"];
-            $user_info["firstname"] = $row["firstname"];
-            $user_info["lastname"] = $row["lastname"];
-            $user_info["birth"] = $row["birth"];
-            $user_info["sex"] = $row["sex"];
-            $user_info["class"] = $row["class"];
-            $user_info["school"] = $row["school"];
-            $user_info["address"] = $row["address"];
-            $user_info["registered"] = $row["registered"];
-            $user_info["approved_date"] = $row["approved_date"];
-
+//Check if the id is sent and its session exists
+if(isset($_POST["id"])){
+    //The ID is sent
+    if(isset($_SESSION[$_POST["id"]])){
+        //The cookie with the ID exists
+        if(is_numeric($_SESSION[$_POST["id"]])){
+            //ID is a number
+            $user_id = $_SESSION[$_POST["id"]];
+        }else{
+            j_die($error['failed_login']);
         }
-    } else {
-        j_die(str_replace('%username%', $username, $error['nonexistant_user']));
+    }else{
+        j_die($error['failed_login']);
     }
-}
-if(isset($_POST["rfid"])){
-    $rfid=$_POST["rfid"];
-    $user_info = array();
-    $get_info = "SELECT * FROM lib_User WHERE rfid='" . $rfid . "'";
-    $get_info_result = $conn->query($get_info);
-    if ($get_info_result->num_rows > 0) {
-        while ($row = $get_info_result->fetch_assoc()) {
-            $user_info["rfid"] = $row["rfid"];
-            $user_info["userID"] = $row["userID"];
-            $user_info["username"] = $row["username"];
-            $user_info["firstname"] = $row["firstname"];
-            $user_info["lastname"] = $row["lastname"];
-            $user_info["birth"] = $row["birth"];
-            $user_info["sex"] = $row["sex"];
-            $user_info["class"] = $row["class"];
-            $user_info["school"] = $row["school"];
-            $user_info["address"] = $row["address"];
-            $user_info["registered"] = $row["registered"];
-            $user_info["approved_date"] = $row["approved_date"];
-        }
-    } else {
-        j_die($error['nonexistant_rfid']);
-    }
+}else{
+    j_die($error['missing_variables']);
 }
 
-if(empty($user_info["userID"])){
-    j_die($error['no_userinfo']);
+$get_user = "SELECT * FROM lib_User WHERE userID = '" . $user_id . "'";
+$get_user_qry = $conn->query($get_user);
+if($get_user_qry->num_rows > 0){
+    if($user = $get_user_qry->fetch_assoc()){
+        //User is found in DB and info is passed on to result array
+        $res = array(
+            'error' => '',
+            'rfid' => $user['rfid'],
+            'userID' => $user['userID'],
+            'username' => $user['username'],
+            'firstname' => $user['firstname'],
+            'lastname' => $user['lastname'],
+            'birth' => $user['birth'],
+            'sex' => $user['sex'],
+            'class' => $user['class'],
+            'school' => $user['school'],
+            'address' => $user['address'],
+            'registered' => $user['registered'],
+            'approved_date' => $user['approved_date']
+        );
+    }else{
+        j_die($error['nonexistant_user']);
+    }
+}else{
+    j_die($error['nonexistant_user']);
 }
 
-$get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book WHERE userID='" . $user_info['userID'] . "'";
+
+//Get the total times, and time, the user has been borrowing books
+$get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book WHERE userID='" . $res['userID'] . "'";
 $get_books_qry = $conn->query($get_books);
-$xx = 0;
+$res['total_times_borrowed'] = 0;
 $total_time = 0;
 if ($get_books_qry->num_rows > 0) {
     while($book = $get_books_qry->fetch_assoc()){
-        $xx++;
+        $res['total_times_borrowed']++;
+        
         if($book['timediff'] == null){
             $total_time += time() - strtotime($book['outDate']);
         }else{
@@ -86,38 +75,42 @@ if ($get_books_qry->num_rows > 0) {
         }
     }
 }else{
-    //echo "No books borrowed";
+    //The user hasn't borrowed any books
 }
 
-$contact_nr=array();
-$test_uname = "SELECT * FROM lib_User_Contact WHERE userID='" . $user_info['userID'] . "'";
-$test_uname_result = $conn->query($test_uname);
-if ($test_uname_result->num_rows > 0) {
-    $usernr=0;
-    while($row = $test_uname_result->fetch_assoc()) {
+//Calculate the total time the book has been borrowed (in a readable time format)
+$res['total_time_borrowed'] = convertSecondsToReadable($total_time);
 
-        $test_uname2 = "SELECT * FROM lib_Contact WHERE contactID='" . $row["contactID"] . "'";
-        $test_uname_result2 = $conn->query($test_uname2);
-        if ($test_uname_result2->num_rows > 0) {
+//Add a contact array to the result
+$res['contact'] = array();
 
-            while($row2 = $test_uname_result2->fetch_assoc()) {
-
-                $user_info["phone"]=$row2["phone"]; //$user_info["contact_".$usernr]["firstname"]=$row2["firstname"]
-                $user_info["email"]=$row2["email"]; // $user_info["contact_".$usernr]["email"]=$row2["email"];
-                $usernr++;
+//Find the link between the user and the contact entries
+$get_user_contact = "SELECT * FROM lib_User_Contact WHERE userID = '" . $res['userID'] . "'";
+$get_user_contact_qry = $conn->query($get_user_contact);
+if ($get_user_contact_qry->num_rows > 0) {
+    //Loop through all contact rows that are related to the user
+    while($user_contact = $get_user_contact_qry->fetch_assoc()) {
+        //Get the contact info from the id
+        $get_contact = "SELECT * FROM lib_Contact WHERE contactID='" . $user_contact["contactID"] . "'";
+        $get_contact_qry = $conn->query($get_contact);
+        if ($get_contact_qry->num_rows > 0) {
+            if($contact = $get_contact_qry->fetch_assoc()) {
+                //Add the information to the result array
+                $res['contact'][] = array(
+                    'phone' => $contact['phone'],
+                    'email' => $contact['email']
+                );
             }
-
+        }else{
+            //The row from lib_User_Contact is not linking to an existing row
         }
     }
 }else{
-
+    //The user doesn't have any contact information
 }
-$user_info['total_times_borrowed'] = $xx;
-$user_info['total_time_borrowed'] = convertSecondsToReadable($total_time);
 
-$user_info["error"]="";
-echo json_encode($user_info);
-    //end
+//Print the result
+echo json_encode($res);
 
 function convertSecondsToReadable($seconds){
     //Find difference in time in a readable format
