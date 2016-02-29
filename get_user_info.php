@@ -16,14 +16,11 @@ $error = array(
 //Check if the id is sent and its session exists
 if(isset($_POST["id"])){
     //The ID is sent
-    if(isset($_SESSION[$_POST["id"]])){
-        //The cookie with the ID exists
-        if(is_numeric($_SESSION[$_POST["id"]])){
-            //ID is a number
-            $user_id = $_SESSION[$_POST["id"]];
-        }else{
-            j_die($error['failed_login']);
-        }
+    require 'login.class.php';
+    $login = new Login();
+    $response = $login->login($_POST['id']);
+    if(is_numeric($response)){
+        $user_id = $response;
     }else{
         j_die($error['failed_login']);
     }
