@@ -32,21 +32,21 @@ class Login{
         return false;
     }
     
-    function create_session($rfid, $pin){
+    function create_session($rfid, $pin = null){
         /*
          * Check if the rfid and pin are correct
         */
         
-        $get_user = "SELECT userID, pin FROM lib_User WHERE rfid = '" . $rfid . "'";
-        $get_user_qry = $this->conn->query($get_user);
+        $get_userid = "SELECT userID FROM lib_RFID WHERE RFID = '" . $rfid . "'";
+        $get_userid_qry = $this->conn->query($get_userid);
         
-        if ($get_user_qry->num_rows > 0) {
-            if($user = $get_user_qry->fetch_assoc()){
-                if($pin == $user['pin']){
+        if ($get_userid_qry->num_rows > 0) {
+            if($userid = $get_userid_qry->fetch_assoc()){
+                if($userid["userID"] != 0){
                     //Credentials are correct
                     $session_id = $this->generate_session_id();
                     $create_session = "INSERT INTO lib_Session (sessionID, userID, timestamp) 
-                        VALUES ('" . $session_id . "', '" . $user['userID'] . "', '" . time() . "')";
+                        VALUES ('" . $session_id . "', '" . $userid['userID'] . "', '" . time() . "')";
                     $create_session_qry = $this->conn->query($create_session);
                     if($create_session_qry === TRUE){
                         //Success
@@ -56,8 +56,8 @@ class Login{
                         $this->error[] = "Klarte ikke &aring; lagre &oslash;kten.";
                     }
                 }else{
-                    //Wrong pin
-                    $this->error[] = "PIN Koden er feil.";
+                    //Wrong type of rfid
+                    $this->error[] = "Feil type rfid.";
                 }
             }else{
                 //Most likely error in the query, but lets say the user wasn't found
@@ -85,7 +85,7 @@ class Login{
         if($sessionID != null){
             $where = "sessionID = '" . $sessionID . "'";
         }else{
-            $where = "userID = '" . $userID . "'"
+            $where = "userID = '" . $userID . "'";
         }
         $logout = "UPDATE lib_Session SET active = 0 WHERE " . $where;
         $logout_qry = $this->conn->query($logout);

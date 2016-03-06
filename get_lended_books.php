@@ -7,9 +7,22 @@ $error = array(
     'nonexistant_user' => 'Den etterspurte brukeren finnes ikke i v&aring;re systemer.'
 );
 
-$username = $_POST['username'];
+//Check if the id is sent and its session exists
+if(isset($_POST["id"])){
+    //The ID is sent
+    require 'login.class.php';
+    $login = new Login();
+    $response = $login->login($_POST['id']);
+    if(is_numeric($response)){
+        $user_id = $response;
+    }else{
+        j_die($error['failed_login']);
+    }
+}else{
+    j_die($error['missing_variables']);
+}
 
-$get_user = "SELECT userID FROM lib_User WHERE username='" . $username . "'";
+$get_user = "SELECT userID FROM lib_User WHERE userID = '" . $user_id . "'";
 $get_user_info_result = $conn->query($get_user);
 
 $res = array('error' => "");
@@ -25,10 +38,22 @@ if ($get_user_info_result->num_rows > 0) {
                 $get_book_details_qry = $conn->query($get_book_details);
                 if($get_book_details_qry->num_rows > 0){
                     if($book_details = $get_book_details_qry->fetch_assoc()){
+                        //Get RFID
+                        $_rfid = "";
+                        $get_rfid = "SELECT RFID FROM lib_RFID WHERE bookID = '" . $book_details['bookID'] . "'";
+                        $get_rfid_qry = $conn->query($get_rfid);
+                        if($get_rfid_qry->num_rows > 0){
+                            if($rfid = $get_rfid_qry->fetch_assoc()){
+                                $_rfid = $rfid['RFID'];
+                            }
+                        }
+                        //Prevent null variables
+                        $inDate = $book['inDate'] ?: "";
+                        //Save results
                         $res['books'][] = array(
                             'outDate' => $book['outDate'],
-                            'inDate' => $book['inDate'],
-                            'RFID' => $book_details['RFID'],
+                            'inDate' => $inDate,
+                            'RFID' => $_rfid,
                             'ISBN' => $book_details['ISBN'],
                             'title' => $book_details['title'],
                             'author' => $book_details['author'],

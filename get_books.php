@@ -15,9 +15,19 @@ $res = array('error' => "");
 
 if ($get_books_qry->num_rows > 0) {
     while($book = $get_books_qry->fetch_assoc()){
+        //Find RFID
+        $_rfid = "";
+        $get_rfid = "SELECT RFID FROM lib_RFID WHERE bookID = '" . $book['bookID'] . "'";
+        $get_rfid_qry = $conn->query($get_rfid);
+        if($get_rfid_qry->num_rows > 0){
+            if($rfid = $get_rfid_qry->fetch_assoc()){
+                $_rfid = $rfid['RFID'];
+            }
+        }
+        //Store results
         $res['books'][] = array(
             'id' => $book['bookID'],
-            'RFID' => $book['RFID'],
+            'RFID' => $_rfid,
             'ISBN' => $book['ISBN'],
             'title' => $book['title'],
             'author' => $book['author'],

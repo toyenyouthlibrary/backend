@@ -53,12 +53,12 @@ if ($test_uname_result->num_rows > 0) {
 }
 
 
-//sjekker om RFID-en av en eller annen grunn er i bruk
+//sjekker om navnet av en eller annen grunn er i bruk
 $test_name = "SELECT * FROM lib_User WHERE firstname='" . $firstname . "' AND lastname = '".$lastname."'";
 $test_name_qry = $conn->query($test_name);
 if ($test_name_qry->num_rows > 0) {
-    //det finnes mer enn 0 rader, ergo finnes emailen allerede
-    j_die($error['name_in_use']); //kode for RFID tatt
+    //det finnes mer enn 0 rader, ergo finnes navnet allerede
+    j_die($error['name_in_use']);
 }
 
 $date= (new DateTime())->format('Y-m-d H:i:s');
@@ -67,8 +67,8 @@ $date= (new DateTime())->format('Y-m-d H:i:s');
 
 //oppretter en standardbruker, uten ekstra kontaktinfo
 $insert_user =
-    "INSERT INTO lib_User (username, firstname, lastname, birth, sex, address_nr, school, pin, address, rfid, registered) VALUES
-    ('".utf8_encode($username)."', '".$firstname."', '".$lastname."', '".$birth."', '', '".$address_nr."', '".$school."', '', '".$address."', '', '".$date."')";
+    "INSERT INTO lib_User (username, firstname, lastname, birth, sex, address_nr, school, pin, address, registered) VALUES
+    ('".utf8_encode($username)."', '".$firstname."', '".$lastname."', '".$birth."', '', '".$address_nr."', '".$school."', '', '".$address."', '".$date."')";
 $insert_user_result = $conn->query($insert_user);
 if ($insert_user_result===TRUE) {
     //Success

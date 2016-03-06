@@ -1,10 +1,4 @@
 <?php
-/*
-Split rfid by ;
-Check which of them is a user
-Error if more rfid's are users
-Last opp alle bøker som lånte
-*/
 require('../../koble_til_database.php');
 session_start();
 

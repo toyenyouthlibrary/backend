@@ -4,11 +4,11 @@ class User{
     public $id = 0;
     private $info = array();
     
-    function __construct($user, $pass){
+    function __construct($user, $pin){
         require('../../koble_til_database.php');
         $this->conn = $conn;
         
-        $get_user = "SELECT * FROM lib_User WHERE LOWER(username) = LOWER('" . $user . "') AND password = '".$pass."'";
+        $get_user = "SELECT * FROM lib_User WHERE LOWER(username) = LOWER('" . $user . "') AND pin = '".$pin."'";
         $get_user_qry = $conn->query($get_user);
         
         $res = array('error' => "");
@@ -19,13 +19,18 @@ class User{
                 $this->info = $user;
             }
         }
+        
+        $get_rfid = "SELECT RFID FROM lib_RFID WHERE userID = '" . $this->id . "'";
+        $get_rfid_qry = $conn->query($get_rfid);
+        if ($get_rfid_qry->num_rows > 0) {
+            if($rfid = $get_rfid_qry->fetch_assoc()){
+                $this->rfid = $user['RFID'];
+            }
+        }
     }
     
     function info(){
-        $approved = $this->info['approved_date'];
-        if($this->info['approved_date'] == null){
-            $approved = "";
-        }
+        $this->info['approved_date'] = $this->info['approved_date'] ?: "";
         $res = array(
             'userID' => $this->info['userID'],
             'username' => $this->info['username'],
@@ -36,9 +41,9 @@ class User{
             'class' => $this->info['class'],
             'school' => $this->info['school'],
             'address' => $this->info['address'],
-            'rfid' => $this->info['rfid'],
+            'rfid' => $this->rfid,
             'registered' => $this->info['registered'],
-            'approved' => $approved
+            'approved' => $this->info['approved_date']
         );
         return $res;
     }

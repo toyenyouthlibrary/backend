@@ -5,16 +5,29 @@ session_start();
 
 $error = array(
     'nonexistant_book' => 'Boken er ikke registrert.',
-    'missing_variables' => 'Ingen rfid mottatt.'
+    'missing_variables' => 'Ingen rfid mottatt.',
+    'invalid_rfid' => 'Denne RFIDen h&oslash;rer ikke til en bok.'
 );
 
 if(!isset($_POST['rfid'])){
     j_die($error['missing_variables']);
 }
 
-$rfid = $_POST['rfid'];
+//Get the book ID
+$book_rfid = $_POST['rfid'];
+$get_bookid = "SELECT bookID FROM lib_RFID WHERE RFID = '" . $book_rfid . "' AND bookID != 0";
+$get_bookid_qry = $conn->query($get_bookid);
+if($get_bookid_qry->num_rows > 0){
+    if($bookid = $get_bookid_qry->fetch_assoc()){
+        $book_id = $bookid['bookID'];
+    }else{
+        j_die($error['invalid_rfid']);
+    }
+}else{
+    j_die($error['invalid_rfid']);
+}
 
-$get_book = "SELECT * FROM lib_Book WHERE rfid='" . $rfid . "'";
+$get_book = "SELECT * FROM lib_Book WHERE bookID = '" . $book_id . "'";
 $get_book_qry = $conn->query($get_book);
 
 $res = array('error' => "");
@@ -40,14 +53,24 @@ if ($get_book_qry->num_rows > 0) {
                     $currtime = false;
                 }
                 
-                $get_user = "SELECT * FROM lib_User WHERE userID='".$lending_stats['userID']."'";
+                $get_user = "SELECT * FROM lib_User WHERE userID = '".$lending_stats['userID']."'";
                 $get_user_qry = $conn->query($get_user);
                 if($get_user_qry->num_rows > 0){
                     if($user = $get_user_qry->fetch_assoc()){
+                        //Get the RFID
+                        $_rfid = "";
+                        $get_rfid = "SELECT RFID FROM lib_RFID WHERE userID = '" . $user['userID'] . "'";
+                        $get_rfid_qry = $conn->query($get_rfid);
+                        if($get_rfid_qry->num_rows > 0){
+                            if($rfid = $get_rfid_qry->fetch_assoc()){
+                                $_rfid = $rfid['RFID'];
+                            }
+                        }
+                        //Store the results
                         $borrowers[] = array(
                             'id' => $user['userID'],
                             'username' => $user['username'],
-                            'RFID' => $user['rfid'],
+                            'RFID' => $_rfid,
                             'borrowed_time' => (int) $lending_stats["timediff"],
                             'current' => $current,
                             'current_time' => $currtime
@@ -96,7 +119,7 @@ if ($get_book_qry->num_rows > 0) {
         
         //Find the feedback of the book
         $feedback = array('comments' => array(), 'stars' => array());
-        $get_feedback = "SELECT * FROM lib_Feedback WHERE book_rfid = '".$book['RFID']."'";
+        $get_feedback = "SELECT * FROM lib_Feedback WHERE book_rfid = '". $book_rfid ."'";
         $get_feedback_qry = $conn->query($get_feedback);
         if ($get_feedback_qry->num_rows > 0) {
             while($feedback_res = $get_feedback_qry->fetch_assoc()){

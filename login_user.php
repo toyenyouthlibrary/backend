@@ -9,8 +9,7 @@ $error = array(
 
 $post_vars = array(
     'obligatory' => array(
-        'rfid',
-        'pin'
+        'rfid'
     )
 );
 
@@ -20,11 +19,12 @@ $vars = $post->verify($post_vars);
 require 'login.class.php';
 $login = new Login();
 
-$session = $login->create_session($vars['rfid'], $vars['pin']);
+$session = $login->create_session($vars['rfid']);
 if($session !== false){
     die(
         json_encode(
             array(
+                'error' => '',
                 'sessionID' => $session
             )
         )

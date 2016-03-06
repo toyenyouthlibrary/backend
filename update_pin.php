@@ -7,6 +7,7 @@ session_start();
 $error = array(
     'inexistant_user' => 'Brukeren finnes ikke.',
     'failed_to_update' => 'Klarte ikke &aring; lagre pinkoden.'
+    'invalid_rfid' => 'Kan ikke oppdatere pin-koden til noe annet enn en bruker.'
 );
 
 $post_vars = array(
@@ -22,6 +23,19 @@ $post_vars = array(
 
 //Array that contains all the post information
 $vars = $post->verify($post_vars);
+
+if($vars['elegible'][0] == "rfid"){
+    //Find the corresponding userID to the rfid and use the id instead
+    $vars['elegible'][0] = "userID";
+    require 'rfid.class.php';
+    $rfid_c = new RFID();
+    $rfid_type = $rfid_c->type($vars['elegible'][1]);
+    if($rfid_type[0] == "user"){
+        $vars['elegible'][1] = $rfid_type[1];
+    }else{
+        j_die($error['invalid_rfid']);
+    }
+}
 
 //Can be changed later on to go straight to the UPDATE query, because it won't do nothing if the user doesn't exist...
 $user_check = "SELECT userID FROM lib_User WHERE " . $vars['elegible'][0] . " = '" . $vars['elegible'][1] . "'";

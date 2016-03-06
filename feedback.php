@@ -58,7 +58,7 @@ if($get_user_qry->num_rows > 0){
 }
 
 //Verify that the book exists
-$get_book = "SELECT * FROM lib_Book WHERE RFID = '".$book_rfid."'";
+$get_book = "SELECT bookID FROM lib_RFID WHERE RFID = '" . $book_rfid . "' AND bookID != 0";
 $get_book_qry = $conn->query($get_book);
 if($get_book_qry->num_rows > 0){
     if($book = $get_book_qry->fetch_assoc()){

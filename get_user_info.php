@@ -35,19 +35,22 @@ if($get_user_qry->num_rows > 0){
         //User is found in DB and info is passed on to result array
         $res = array(
             'error' => '',
-            'rfid' => $user['rfid'],
             'userID' => $user['userID'],
             'username' => $user['username'],
             'firstname' => $user['firstname'],
             'lastname' => $user['lastname'],
             'birth' => $user['birth'],
             'sex' => $user['sex'],
-            'class' => $user['class'],
             'school' => $user['school'],
             'address' => $user['address'],
             'registered' => $user['registered'],
             'approved_date' => $user['approved_date']
         );
+        
+        //To avoid returning null variables
+        if($res['approved_date'] == null){
+            $res['approved_date'] = "";
+        }
     }else{
         j_die($error['nonexistant_user']);
     }
@@ -55,6 +58,15 @@ if($get_user_qry->num_rows > 0){
     j_die($error['nonexistant_user']);
 }
 
+//Get the RFID
+$res['rfid'] = '';
+$get_rfid = "SELECT RFID FROM lib_RFID WHERE userID = '" . $user_id . "'";
+$get_rfid_qry = $conn->query($get_rfid);
+if($get_rfid_qry->num_rows > 0){
+    if($rfid = $get_rfid_qry->fetch_assoc()){
+        $res['rfid'] = $rfid['RFID'];
+    }
+}
 
 //Get the total times, and time, the user has been borrowing books
 $get_books = "SELECT TIMESTAMPDIFF(SECOND,outDate,inDate) AS timediff, outDate FROM lib_User_Book WHERE userID='" . $res['userID'] . "'";
