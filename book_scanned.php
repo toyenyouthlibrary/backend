@@ -156,7 +156,8 @@ function get_book_info($book){
     return array(
         'title' => $book['title'],
         'author' => $book['author'],
-        'ISBN' => $book['ISBN']
+        'ISBN10' => $book['ISBN10']
+        'ISBN13' => $book['ISBN13']
     );
 }
 ?>

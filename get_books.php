@@ -28,7 +28,8 @@ if ($get_books_qry->num_rows > 0) {
         $res['books'][] = array(
             'id' => $book['bookID'],
             'RFID' => $_rfid,
-            'ISBN' => $book['ISBN'],
+            'ISBN10' => $book['ISBN10'],
+            'ISBN13' => $book['ISBN13'],
             'title' => $book['title'],
             'author' => $book['author'],
             'type' => $book['type'],

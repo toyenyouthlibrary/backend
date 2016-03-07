@@ -146,7 +146,8 @@ if ($get_book_qry->num_rows > 0) {
         
         //Print book info
         $res['book'] = array(
-            'ISBN' => $book['ISBN'],
+            'ISBN10' => $book['ISBN10'],
+            'ISBN13' => $book['ISBN13'],
             'total_lend_time' => convertSecondsToReadable($total_lended_time),
             'total_lend_times' => count($borrowers),
             'borrowers' => $borrowers_v2,
