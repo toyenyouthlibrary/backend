@@ -1,14 +1,13 @@
 <?php
 
 class Lists{
-    function __construct($type, $order = null, $filter = ""){
+    function __construct($type, $order = null){
         //Connect to db
         require '../../../koble_til_database.php';
         //Required variables
         $this->conn = $conn;
         $this->type = $type;
         $this->order = $order;
-        $this->filter = $filter;
         
         if($order == null){
             if($type == "books"){
@@ -20,45 +19,43 @@ class Lists{
         
         if($type == "books"){
             $this->tbl = "lib_Book";
+            $this->fields = array(
+                'bookID',
+                'ISBN10',
+                'ISBN13',
+                'title',
+                'author',
+                'original-title'
+            );
         }else if($type == "users"){
             $this->tbl = "lib_User";
+            $this->fields = array(
+                'userID',
+                'username',
+                'birth',
+                'firstname',
+                'lastname',
+                'school',
+                'sex',
+                'address',
+                'registered',
+                'approved_date'
+            );
         }
     }
     
     function getList(){
         
-        $get_list = "SELECT * FROM $this->tbl ORDER BY ".$this->order.$this->filter;
+        $get_list = "SELECT * FROM $this->tbl WHERE active = '1' ORDER BY ".$this->order." ";
         $get_list_qry = $this->conn->query($get_list);
         $res = array();
-        while($list_item = $get_list_qry->fetch_assoc()){
-            if($this->type == "books"){
-                //Formatting of the result of the books list
-                $res[] = array(
-                    'title' => 'lol',
-                    'author' => 'u',
-                    'published' => 'be',
-                    'amount' => 'fgt',
-                    'id' => $list_item['bookID']
-                );
-            }else if($this->type == "users"){
-                //Formatting of the result of user list
-                $approved = false;
-                if($list_item['approved_date'] != null){
-                    $approved = true;
+        if($get_list_qry->num_rows > 0){
+            while($list_item = $get_list_qry->fetch_assoc()){
+                $temp_res = array();
+                foreach($this->fields as $field){
+                    $temp_res[$field] = $list_item[$field];
                 }
-                $res[] = array(
-                    'username' => $list_item['username'],
-                    'age' => $list_item['age'],
-                    'name' => $list_item['name'],
-                    'class' => $list_item['class'],
-                    'school' => $list_item['school'],
-                    'sex' => $list_item['sex'],
-                    'address' => $list_item['address'],
-                    'registered' => $list_item['registered'],
-                    'id' => $list_item['userID'],
-                    'rfid' => $list_item['rfid'],
-                    'approved' => $approved
-                );
+                $res[] = $temp_res;
             }
         }
         return $res;

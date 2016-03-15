@@ -25,7 +25,7 @@ class History{
                     'inDate' => $history['inDate']
                 );
                 //Get user info
-                $get_user = "SELECT username FROM lib_User WHERE userID = ".$history['userID'];
+                $get_user = "SELECT username FROM lib_User WHERE userID = ".$history['userID']." AND active = '1'";
                 $get_user_qry = $this->conn->query($get_user);
                 if($get_user_qry->num_rows > 0){
                     if($user = $get_user_qry->fetch_assoc()){
