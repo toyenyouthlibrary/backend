@@ -9,8 +9,9 @@ $error = array(
     'no_user_rfid' => 'For &aring; l&aring;ne b&oslash;ker m&aring; du skanne en bruker-enhet.',
     'nonexistant_book' => 'Boken ble ikke funnet i databasen.',
     'failed_to_deliver_book' => 'Klarte ikke &aring; levere boken.',
-    'deliver_success' => 'Du har levert boken.',
-    'lend_success' => 'Du har l&aring;nt boken.'
+    'deliver_success' => '',
+    'lend_success' => '',
+    'only_one_action_allowed' => 'Du kan ikke l&aring;ne og levere samtidig.'
 );
 
 $post_vars = array(
@@ -49,6 +50,7 @@ if(count($books) < 1){
     j_die($error['no_book_rfid']);
 }
 
+$action = 0;
 /*
     Deliver / lend the book
 */
@@ -56,8 +58,9 @@ $date= (new DateTime())->format('Y-m-d H:i:s');
 
 $res = array('error' => '');
 $deliver = array();
+$lend = array();
 for($i = 0; $i < count($books); $i++){
-    $get_book = "SELECT bookID, title, author, ISBN FROM lib_Book WHERE bookID = '" . $books[$i] . "'";
+    $get_book = "SELECT bookID, title, author, ISBN10 FROM lib_Book WHERE bookID = '" . $books[$i] . "'";
     $get_book_qry = $conn->query($get_book);
     if($get_book_qry->num_rows > 0){
         if($book = $get_book_qry->fetch_assoc()){
@@ -71,30 +74,32 @@ for($i = 0; $i < count($books); $i++){
                     if($book_user['inDate'] == null){
                         $lended = true;
                     }
+                    $user = $book_user['userID'];
                 }
             }
             if($lended){
                 //Deliver book
                 $deliver[] = $book;
+                if($action == 0 || $action == "deliver"){
+                    $action = "deliver";
+                }else{
+                    j_die($error['only_one_action_allowed']);
+                }
+                $res['type'] = "deliver";
             }else{
                 if($user != 0){
-                    //Lend book
-                    $insert_user_book = "INSERT INTO lib_User_Book (userID, outDate, bookID) VALUES 
-                        ('" . $user . "', '" . $date . "', '" . $book['bookID'] . "')";
-                    $insert_user_book_qry = $conn->query($insert_user_book);
-                    if($insert_user_book_qry === TRUE){
-                        //Success
-                        $res['status'][] = array(
-                            'book_info' => get_book_info($book),
-                            'error' => $error['lend_success']
-                        );
+                    if($action == 0 || $action == "lend"){
+                        $action = "lend";
                     }else{
-                        //Failed lend book
-                        $res['status'][] = array(
-                            'book_info' => get_book_info($book),
-                            'error' => $error['failed_to_lend_book']
-                        );
+                        j_die($error['only_one_action_allowed']);
                     }
+                    //Lend book
+                    $lend[] = array(
+                        'user' => $user,
+                        'date' => $date,
+                        'book' => $book
+                    );
+                    $res['type'] = "lend";
                 }else{
                     //No user RFID sent
                     $res['status'][] = array(
@@ -115,6 +120,26 @@ for($i = 0; $i < count($books); $i++){
         $res['status'][] = array(
             'book_info' => '',
             'error' => $error['nonexistant_book']
+        );
+    }
+}
+
+//Lend shiet
+for($i = 0; $i < count($lend); $i++){
+    $insert_user_book = "INSERT INTO lib_User_Book (userID, outDate, bookID) VALUES 
+        ('" . $lend[$i]['user'] . "', '" . $lend[$i]['date'] . "', '" . $lend[$i]['book']['bookID'] . "')";
+    $insert_user_book_qry = $conn->query($insert_user_book);
+    if($insert_user_book_qry === TRUE){
+        //Success
+        $res['status'][] = array(
+            'book_info' => get_book_info($lend[$i]['book']),
+            'error' => $error['lend_success']
+        );
+    }else{
+        //Failed lend book
+        $res['status'][] = array(
+            'book_info' => get_book_info($lend[$i]['book']),
+            'error' => $error['failed_to_lend_book']
         );
     }
 }
@@ -150,14 +175,28 @@ if($where_st != ""){
     }
 }
 
+//Get username
+$res['username'] = "";
+if($user != 0){
+    $get_username = "SELECT username FROM lib_User WHERE userID = '".$user."'";
+    $get_username_qry = $conn->query($get_username);
+    if($get_username_qry->num_rows > 0){
+        if($user = $get_username_qry->fetch_assoc()){
+            $res['username'] = $user['username'];
+        }
+    }
+}
+
 echo json_encode($res);
 
 function get_book_info($book){
     return array(
         'title' => $book['title'],
         'author' => $book['author'],
-        'ISBN10' => $book['ISBN10']
-        'ISBN13' => $book['ISBN13']
+        'ISBN10' => $book['ISBN10'],
+        'ISBN13' => $book['ISBN13'],
+        'delivery_date' => 'xx.xx.xx',
+        'shelf' => 'xxx'
     );
 }
 ?>
