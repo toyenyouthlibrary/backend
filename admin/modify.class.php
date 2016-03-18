@@ -46,9 +46,13 @@ class Modify{
             return false;
         }
         $vars = "";
-        foreach($fields as $field){
+        foreach($fields as $key => $field){
+            $or_var = $original_vars[$field];
+            if($key == "RFID"){
+                $or_var = trim($or_var, ";");
+            }
             if(isset($original_vars[$field])){
-                $vars .= "`".$field."` = '".$original_vars[$field]."', ";
+                $vars .= "`".$field."` = '".$or_var."', ";
             }
         }
         $vars = trim($vars, ", ");

@@ -317,6 +317,42 @@ if(isset($_GET['index'])){
         }else{
             echo "Mangler obligatorisk variabel.";
         }
+    }else if($index_a[0] == 'rfid'){
+        if(isset($index_a[1])){
+            if($index_a[1] == 'create'){
+                if(isset($index_a[2]) && isset($index_a[3])){
+                    require 'rfid.class.php';
+                    $rfid = new RFID();
+                    $create = $rfid->create($index_a[2], $index_a[3]);
+                    if($create === true){
+                        header("Location: ".URL_ROOT.$index_a[2]."s/info/".$index_a[3]);
+                        echo 'Vellykket';
+                    }else{
+                        echo 'Feilet<br>'.$rfid->error;
+                    }
+                }else{
+                    echo 'Mangler obligatorisk variabel.';
+                }
+            }else if($index_a[1] == 'delete'){
+                if(isset($index_a[2]) && isset($index_a[3]) && isset($index_a[4])){
+                    require 'rfid.class.php';
+                    $rfid = new RFID();
+                    $delete = $rfid->delete($index_a[2]);
+                    if($delete === true){
+                        header("Location: ".URL_ROOT.$index_a[3]."s/info/".$index_a[4]);
+                        echo 'Vellykket';
+                    }else{
+                        echo 'Feilet<br>'.$rfid->error;
+                    }
+                }else{
+                    echo 'Mangler obligatorisk variabel.';
+                }
+            }else{
+                echo 'Mangler obligatorisk variabel.';
+            }
+        }else{
+            
+        }
     }
 }else{
     //Default page
@@ -374,8 +410,8 @@ function print_info($info){
     }
     
     //RFID
+    echo '<h2>RFID</h2>';
     if(isset($info['rfid']) && is_array($info['rfid'])){
-        echo '<h2>RFID</h2>';
         echo '<table cellspacing=0>';
         foreach($info['rfid'] as $key => $rfid){
             echo '<tr><td>';
@@ -384,12 +420,13 @@ function print_info($info){
             echo '<p class="p">'.$rfid.'</p>';
             echo '<input type="hidden" name="original" class="original" value="'.$rfid.'" />';
             echo '<input type="hidden" name="new" class="new" /></form></td>';
-            echo '<td><input type="button" value="Endre" onclick="change_rfid('.$key.')" /></td>';
+            echo '<td><input type="button" value="Endre" onclick="change_rfid('.$key.')" /> <input type="button" value="Slett" onclick="window.location.href=\''.URL_ROOT.'rfid/delete/'.$rfid.'/'.$type.'/'.$info[$type."ID"].'\'" /></td>';
             echo '</tr>
             ';
         }
         echo '</table>';
     }
+    echo '<input type="button" onclick="window.location.href = \''.URL_ROOT.'rfid/create/'.$type.'/'.$info[$type."ID"].'\'" value="Legg til RFID">';
     
     //Lended history
     echo '<h2>Lånehistorikk</h2>';

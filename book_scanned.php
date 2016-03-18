@@ -154,7 +154,7 @@ for($i = 0; $i < count($deliver); $i++){
     }
 }
 if($where_st != ""){
-    $deliver_books = "UPDATE lib_User_Book SET inDate = '" . $date . "' " . $where_st;
+    $deliver_books = "UPDATE lib_User_Book SET inDate = '" . $date . "' " . $where_st . " ORDER BY bookID DESC LIMIT 1";
     $deliver_books_qry = $conn->query($deliver_books);
     if ($deliver_books_qry === TRUE) {
         //Success
