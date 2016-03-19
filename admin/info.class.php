@@ -11,6 +11,7 @@ class Info{
         $this->error = "";
         
         if($type == "books"){
+            $active_required = true;
             $this->id_field = "bookID";
             $this->tbl = "lib_Book";
             $this->fields = array(
@@ -25,6 +26,7 @@ class Info{
                 'registered'
             );
         }else if($type == "users"){
+            $active_required = true;
             $this->id_field = "userID";
             $this->tbl = "lib_User";
             $this->fields = array(
@@ -41,11 +43,24 @@ class Info{
                 'registered',
                 'approved_date'
             );
+        }else if($type == "shelves"){
+            $active_required = false;
+            $this->id_field = "shelfID";
+            $this->tbl = "lib_Shelf";
+            $this->fields = array(
+                'shelfID',
+                'name'
+            );
+        }
+        
+        $this->active = "";
+        if($active_required){
+            $this->active = "AND active = '1'";
         }
     }
     
     function getInfo(){
-        $get_info = "SELECT * FROM $this->tbl WHERE ".$this->fields[0]." = '$this->id' AND active = '1'";
+        $get_info = "SELECT * FROM $this->tbl WHERE ".$this->fields[0]." = '$this->id' ".$this->active;
         $get_info_qry = $this->conn->query($get_info);
         if($get_info_qry->num_rows > 0){
             if($info = $get_info_qry->fetch_assoc()){
@@ -56,7 +71,9 @@ class Info{
                 if($this->type == "users"){
                     $res['contact'] = $this->getContactInfo();
                 }
-                $res['lended'] = $this->getLendHistory();
+                if($this->type == "users" || $this->type == "books"){
+                    $res['lended'] = $this->getLendHistory();
+                }
                 $res['rfid'] = $this->getRFID();
                 return $res;
             }

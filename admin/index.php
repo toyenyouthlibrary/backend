@@ -61,16 +61,17 @@ if(isset($_POST['debug'])){
 ?>
 <div id="menu">
     <ul>
-        <li><a href="<?php echo URL_ROOT; ?>books">Bøker</a></li>
+        <li><a href="<?php echo URL_ROOT; ?>list/books">Bøker</a></li>
         <ul>
             <li><a href="<?php echo URL_ROOT; ?>books/stats">Statistikk</a></li>
-            <li><a href="<?php echo URL_ROOT; ?>books/create">Last opp</a></li>
+            <li><a href="<?php echo URL_ROOT; ?>create/book">Last opp</a></li>
         </ul>
-        <li><a href="<?php echo URL_ROOT; ?>users">Brukere</a></li>
+        <li><a href="<?php echo URL_ROOT; ?>list/users">Brukere</a></li>
         <ul>
             <li><a href="<?php echo URL_ROOT; ?>users/stats">Statistikk</a></li>
-            <li><a href="<?php echo URL_ROOT; ?>users/create">Lag ny</a></li>
+            <li><a href="<?php echo URL_ROOT; ?>create/user">Lag ny</a></li>
         </ul>
+        <li><a href="<?php echo URL_ROOT; ?>list/shelves">Hyller</a></li>
         <li><a href="<?php echo URL_ROOT; ?>global">Globalt</a></li>
         <li><a href="<?php echo URL_ROOT; ?>rfid/search">Søk RFID</a></li>
     </ul>
@@ -81,26 +82,7 @@ if(isset($_GET['index'])){
     $index = $_GET['index'];
     $index_a = explode('/', $index);
     if($index_a[0] == "books"){
-        if(!isset($index_a[1])){
-            require 'list.class.php';
-            $list = new Lists($index_a[0]);
-            $books = $list->getList();
-            if($books != false){
-                echo '<table cellspacing=0><tr><th>ISBN 10</th><th>ISBN 13</th><th>Tittel</th><th>Original tittel</th><th>Forfatter</th></tr>';
-                foreach($books as $book){
-                    echo '<tr onclick="window.location.href = \''.URL_ROOT.'books/info/'.$book['bookID'].'\';" style="cursor:pointer;">
-                        <td>'.$book['ISBN10'].'</td>
-                        <td>'.$book['ISBN13'].'</td>
-                        <td>'.$book['title'].'</td>
-                        <td>'.$book['original-title'].'</td>
-                        <td>'.$book['author'].'</td>
-                    </tr>';
-                }
-                echo '</table>';
-            }else{
-                echo 'Klarte ikke å laste ned listen av bøker.';
-            }
-        }else if($index_a[1] == "stats"){
+        if($index_a[1] == "stats"){
             require 'stats.class.php';
             //Preset variables if the server doesn't send something specific
             $amount = array(
@@ -123,67 +105,10 @@ if(isset($_GET['index'])){
                 $stats = new Stats($index_a[0]);
                 $res['stats'] = $stats->printStats();
             }
-        }else if($index_a[1] == "create"){
-            if(isset($_POST['title'])){
-                require 'book_and_user_functions.class.php';
-                $create = new CreateUsersAndBooks("book");
-                $new_book = $create->add($_POST);
-                if($new_book != false){
-                    header("Location: ".URL_ROOT."books/info/".$new_book);
-                    echo "Vellykket.";
-                }else{
-                    echo "Feilet<br>".$create->error;
-                }
-            }else{
-                printCreateForm("book");
-            }
-            
-        }else if($index_a[1] == "info"){
-            if(isset($index_a[2])){
-                require 'info.class.php';
-                $information = new Info($index_a[0], $index_a[2]);
-                $info = $information->getInfo();
-                if($info != false){
-                    print_info($info);
-                }else{
-                    echo $info->error;
-                }
-            }else{
-                echo "Ingen bok er spesifisert. Velg en bok fra listen av alle bøker.";
-            }
-        }else if($index_a[1] == "delete"){
-            if(isset($index_a[2])){
-                require 'book_and_user_functions.class.php';
-                $delete = new CreateUsersAndBooks("book");
-                $del = $delete->delete($index_a[2]);
-                if($del == true){
-                    header("Location: ".URL_ROOT."books");
-                    echo "Vellykket.";
-                }else{
-                    echo "Feilet<br>".$delete->error;
-                }
-            }else{
-                echo "Mangler obligatorisk variabel.";
-            }
         }
     }else if($index_a[0] == "users"){
         //User pages
-        if(!isset($index_a[1])){
-            require 'list.class.php';
-            $list = new Lists($index_a[0]);
-            $users = $list->getList();
-            echo '<table cellspacing=0><tr><th>Brukernavn</th><th>Navn</th><th>Fødselsdato</th><th>Kjønn</th><th>Skole</th></tr>';
-            foreach($users as $user){
-                echo '<tr onclick="window.location.href = \''.URL_ROOT.'users/info/'.$user['userID'].'\';" style="cursor:pointer;">
-                    <td>'.$user['username'].'</td>
-                    <td>'.$user['firstname'].' '.$user['lastname'].'</td>
-                    <td>'.$user['birth'].'</td>
-                    <td>'.$user['sex'].'</td>
-                    <td>'.$user['school'].'</td>
-                </tr>';
-            }
-            echo '</table>';
-        }else if($index_a[1] == "stats"){
+        if($index_a[1] == "stats"){
             require 'stats.class.php';
             //Default stats page, without extra variables
             
@@ -194,47 +119,6 @@ if(isset($_GET['index'])){
             }else{
                 //As there are no "global" stats for users yet (haven't come up with a reason to have it, and what it would include)
                 $res['error'] = 'Ingen bruker er spesifisert.';
-            }
-        }else if($index_a[1] == "create"){
-            if(isset($_POST['firstname'])){
-                require 'book_and_user_functions.class.php';
-                $create = new CreateUsersAndBooks("user");
-                $new_book = $create->add($_POST);
-                if($new_book != false){
-                    header("Location: ".URL_ROOT."users/info/".$new_book);
-                    echo "Vellykket.";
-                }else{
-                    echo "Feilet<br>".$create->error;
-                }
-            }else{
-                printCreateForm("user");
-            }
-        }else if($index_a[1] == "delete"){
-            if(isset($index_a[2])){
-                require 'book_and_user_functions.class.php';
-                $delete = new CreateUsersAndBooks("user");
-                $del = $delete->delete($index_a[2]);
-                if($del == true){
-                    header("Location: ".URL_ROOT."users");
-                    echo "Vellykket.";
-                }else{
-                    echo "Feilet<br>".$delete->error;
-                }
-            }else{
-                echo "Mangler obligatorisk variabel.";
-            }
-        }else if($index_a[1] == "info"){
-            if(isset($index_a[2])){
-                require 'info.class.php';
-                $information = new Info($index_a[0], $index_a[2]);
-                $info = $information->getInfo();
-                if($info != false){
-                    print_info($info);
-                }else{
-                    echo $info->error;
-                }
-            }else{
-                echo "Ingen bok er spesifisert. Velg en bok fra listen av alle bøker.";
             }
         }
     }else if($index_a[0] == "global"){
@@ -248,6 +132,123 @@ if(isset($_GET['index'])){
                 $res['history'] = $history->getHistory();
             }else{
                 
+            }
+        }
+    }else if($index_a[0] == "list"){
+        if(isset($index_a[1])){
+            $fields = array(
+                'shelves' => array(
+                    'id' => 'shelfID',
+                    'fields' => array(
+                        'ID' => 'shelfID',
+                        'Navn' => 'name'
+                    )
+                ), 'books' => array(
+                    'id' => 'bookID',
+                    'fields' => array(
+                        'ISBN 10' => 'ISBN10',
+                        'ISBN 13' => 'ISBN13',
+                        'Tittel' => 'title',
+                        'Original tittel' => 'original-title',
+                        'Forfatter' => 'author',
+                    )
+                ), 'users' => array(
+                    'id' => 'userID',
+                    'fields' => array(
+                        'Brukernavn' => 'username',
+                        'Navn' => array('firstname', 'lastname'),
+                        'Fødselsdato' => 'birth',
+                        'Kjønn' => 'sex',
+                        'Skole' => 'school',
+                    )
+                )
+            );
+            
+            if(isset($fields[$index_a[1]])){
+                require 'list.class.php';
+                $list = new Lists($index_a[1]);
+                $list_res = $list->getList();
+                echo '<table cellspacing=0><tr>';
+                foreach($fields[$index_a[1]]['fields'] as $key => $field){
+                    echo '<th>'.$key.'</th>';
+                }
+                echo '</tr>';
+                foreach($list_res as $info){
+                    echo '<tr onclick="window.location.href = \''.URL_ROOT.'info/'.$index_a[1].'/'.$info[$fields[$index_a[1]]['id']].'\';" style="cursor:pointer;">';
+                        foreach($fields[$index_a[1]]['fields'] as $field){
+                            echo '<td>';
+                            if(is_array($field)){
+                                foreach($field as $subfield){
+                                    echo $info[$subfield]." ";
+                                }
+                            }else{
+                                echo $info[$field];
+                            }
+                            echo '</td>';
+                        }
+                    echo '</tr>';
+                }
+                echo '</table>';
+            }else{
+                echo 'Ukjent.';
+            }
+        }
+    }else if($index_a[0] == "info"){
+        //Book
+        if(isset($index_a[1]) && isset($index_a[2])){
+            require 'info.class.php';
+            $information = new Info($index_a[1], $index_a[2]);
+            $info = $information->getInfo();
+            if($info != false){
+                print_info($info);
+            }else{
+                echo $info->error;
+            }
+        }else{
+            echo "Mangler data :/";
+        }
+    }else if($index_a[0] == "create"){
+        if(isset($index_a[1])){
+            $fields = array(
+                'book' => array(
+                    'verifyer' => 'title'
+                    
+                ), 'user' => array(
+                    'verifyer' => 'firstname'
+                )
+            );
+            if(isset($fields[$index_a[1]])){
+                if(isset($_POST[$fields[$index_a[1]]['verifyer']])){
+                    require 'book_and_user_functions.class.php';
+                    $create = new CreateUsersAndBooks($index_a[1]);
+                    $new = $create->add($_POST);
+                    if($new != false){
+                        header("Location: ".URL_ROOT."info/".$index_a[1]."s/".$new);
+                        echo "Vellykket.";
+                    }else{
+                        echo "Feilet<br>".$create->error;
+                    }
+                }else{
+                    printCreateForm($index_a[1]);
+                }
+            }else{
+                echo 'Mangler stuff';
+            }
+        }
+    }else if($index_a[0] == "delete"){
+        if(isset($index_a[1])){
+            if(isset($index_a[2])){
+                require 'book_and_user_functions.class.php';
+                $delete = new CreateUsersAndBooks($index_a[1]);
+                $del = $delete->delete($index_a[2]);
+                if($del == true){
+                    header("Location: ".URL_ROOT."list/".$index_a[1]."s");
+                    echo "Vellykket.";
+                }else{
+                    echo "Feilet<br>".$delete->error;
+                }
+            }else{
+                echo "Mangler obligatorisk variabel.";
             }
         }
     }else if($index_a[0] == "modify"){
@@ -326,7 +327,7 @@ if(isset($_GET['index'])){
                     $rfid = new RFID();
                     $create = $rfid->create($index_a[2], $index_a[3]);
                     if($create === true){
-                        header("Location: ".URL_ROOT.$index_a[2]."s/info/".$index_a[3]);
+                        header("Location: ".URL_ROOT."info/".get_plural($index_a[2])."/".$index_a[3]);
                         echo 'Vellykket';
                     }else{
                         echo 'Feilet<br>'.$rfid->error;
@@ -340,7 +341,7 @@ if(isset($_GET['index'])){
                     $rfid = new RFID();
                     $delete = $rfid->delete($index_a[2]);
                     if($delete === true){
-                        header("Location: ".URL_ROOT.$index_a[3]."s/info/".$index_a[4]);
+                        header("Location: ".URL_ROOT."info/".get_plural($index_a[3])."/".$index_a[4]);
                         echo 'Vellykket';
                     }else{
                         echo 'Feilet<br>'.$rfid->error;
@@ -386,15 +387,20 @@ function print_info($info){
     if(isset($info['userID'])){
         $type = "user";
         echo '<h2>Brukerinformasjon</h2>';
-    }else{
+    }else if(isset($info['bookID'])){
         $type = "book";
         echo '<h2>Bokinformasjon</h2>';
+    }else if(isset($info['shelfID'])){
+        $type = "shelf";
+        echo '<h2>Hylle informasjon</h2>';
+    }else{
+        return false;
     }
     //Print general info
     echo '<table cellspacing=0><form method="POST" action="'.URL_ROOT.'modify/'.$type.'/'.$info[$type."ID"].'/'.$info[$type."ID"].'">';
     foreach($info as $key => $inf){
         if(!is_array($inf)){
-            if($key != "userID" && $key != "bookID" && $key != "username" && $key != "registered"){
+            if($key != "userID" && $key != "bookID" && $key != "shelfID" && $key != "username" && $key != "registered"){
                 if($key == "sex"){
                     echo '<tr><td>Kjønn</td><td><select name="'.$key.'">';
                     $descs = array("Ikke spesifisert", "Gutt", "Jente");
@@ -487,7 +493,7 @@ function print_info($info){
         echo '</table>';
     }
     //Button to delete user
-    echo '<h3>Slett</h3><input type="button" value="Slett" onclick="window.location.href = \''.URL_ROOT.$type.'s/delete/'.$info[$type."ID"].'\'">';
+    echo '<h3>Slett</h3><input type="button" value="Slett" onclick="window.location.href = \''.URL_ROOT.'delete/'.$type.'/'.$info[$type."ID"].'\'">';
     
     echo "</div>";
     
@@ -499,7 +505,7 @@ function printCreateForm($type){
     $create = new CreateUsersAndBooks($type);
     ?>
     <div class="padding">
-    <form method="POST" action="<?php echo URL_ROOT.$type."s/create" ?>">
+    <form method="POST" action="<?php echo URL_ROOT."create/".$type; ?>">
     <table cellspacing=0>
     <?php
     foreach($create->fields as $field){
@@ -516,6 +522,21 @@ function printCreateForm($type){
 function display_rfid_script($action = "default"){
     echo '<script>var action = "'.$action.'";</script>';
     echo '<script src="rfid_scanner.js"></script>';
+}
+
+function get_plural($type){
+    if($type == "shelf"){
+        return "shelves";
+    }else{
+        return $type."s";
+    }
+}
+function get_singular($plural){
+    if($plural == "shelves"){
+        return "shelf";
+    }else{
+        return rtrim($plural, "s");
+    }
 }
 ?>
 

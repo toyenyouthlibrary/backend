@@ -10,14 +10,18 @@ class Lists{
         $this->order = $order;
         
         if($order == null){
+            $this->order = "ORDER BY ";
             if($type == "books"){
-                $this->order = "bookID";
+                $this->order .= "bookID";
             }else if($type == "users"){
-                $this->order = "userID";
+                $this->order .= "userID";
+            }else if($type == "shelves"){
+                $this->order .= "shelfID";
             }
         }
         
         if($type == "books"){
+            $active_required = true;
             $this->tbl = "lib_Book";
             $this->fields = array(
                 'bookID',
@@ -28,6 +32,7 @@ class Lists{
                 'original-title'
             );
         }else if($type == "users"){
+            $active_required = true;
             $this->tbl = "lib_User";
             $this->fields = array(
                 'userID',
@@ -41,12 +46,24 @@ class Lists{
                 'registered',
                 'approved_date'
             );
+        }else if($type == "shelves"){
+            $active_required = false;
+            $this->tbl = "lib_Shelf";
+            $this->fields = array(
+                'shelfID',
+                'name'
+            );
+        }
+        
+        $this->active = "";
+        if($active_required){
+            $this->active = "WHERE active = '1'";
         }
     }
     
     function getList(){
         
-        $get_list = "SELECT * FROM $this->tbl WHERE active = '1' ORDER BY ".$this->order." ";
+        $get_list = "SELECT * FROM $this->tbl ".$this->active." ".$this->order." ";
         $get_list_qry = $this->conn->query($get_list);
         $res = array();
         if($get_list_qry->num_rows > 0){
