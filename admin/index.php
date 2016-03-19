@@ -151,20 +151,6 @@ if(isset($_GET['index'])){
             }else{
                 echo "Ingen bok er spesifisert. Velg en bok fra listen av alle bøker.";
             }
-        }else if($index_a[1] == "modify"){
-            if(isset($index_a[2])){
-                require 'modify.class.php';
-                $mod = new Modify();
-                $update = $mod->update("lib_Book", array('bookID', $index_a[2]), $_POST);
-                if($update === true){
-                    header("Location: ".URL_ROOT."books/info/".$index_a[2]);
-                    echo "Vellykket.";
-                }else{
-                    echo "Feilet<br>".$mod->error;
-                }
-            }else{
-                echo "Mangler obligatorisk variabel.";
-            }
         }else if($index_a[1] == "delete"){
             if(isset($index_a[2])){
                 require 'book_and_user_functions.class.php';
