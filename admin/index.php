@@ -164,6 +164,20 @@ if(isset($_GET['index'])){
             }else{
                 echo "Mangler obligatorisk variabel.";
             }
+        }else if($index_a[1] == "delete"){
+            if(isset($index_a[2])){
+                require 'book_and_user_functions.class.php';
+                $delete = new CreateUsersAndBooks("book");
+                $del = $delete->delete($index_a[2]);
+                if($del == true){
+                    header("Location: ".URL_ROOT."books");
+                    echo "Vellykket.";
+                }else{
+                    echo "Feilet<br>".$delete->error;
+                }
+            }else{
+                echo "Mangler obligatorisk variabel.";
+            }
         }
     }else if($index_a[0] == "users"){
         //User pages
@@ -213,7 +227,7 @@ if(isset($_GET['index'])){
                 require 'book_and_user_functions.class.php';
                 $delete = new CreateUsersAndBooks("user");
                 $del = $delete->delete($index_a[2]);
-                if($del == false){
+                if($del == true){
                     header("Location: ".URL_ROOT."users");
                     echo "Vellykket.";
                 }else{
@@ -372,10 +386,23 @@ function print_info($info){
     foreach($info as $key => $inf){
         if(!is_array($inf)){
             if($key != "userID" && $key != "bookID" && $key != "username" && $key != "registered"){
-                echo '<tr>
-                    <td>'.$key.'</td>
-                    <td><input type="text" name="'.$key.'" maxlength=400 value="'.$inf.'" /></td>
-                </tr>';
+                if($key == "sex"){
+                    echo '<tr><td>Kjønn</td><td><select name="'.$key.'">';
+                    $descs = array("Ikke spesifisert", "Gutt", "Jente");
+                    for($i = 0;$i < count($descs); $i++){
+                        $selected = '';
+                        if($i == $inf){
+                            $selected = 'selected="selected"';
+                        }
+                        echo '<option value="'.$i.'" '.$selected.'>'.$descs[$i].'</option>';
+                    }
+                    echo '</select></td></tr>';
+                }else{
+                    echo '<tr>
+                        <td>'.$key.'</td>
+                        <td><input type="text" name="'.$key.'" maxlength=400 value="'.$inf.'" /></td>
+                    </tr>';
+                }
             }else{
                 echo '<tr>
                     <td>'.$key.'</td>
@@ -388,8 +415,6 @@ function print_info($info){
     echo '<tr><td colspan=2><button>Oppdater</button></td></tr></form></table>';
     //Contact info
     if($type == "user"){
-        //Button to delete user
-        echo '<h3>Slett bruker</h3><input type="button" value="Slett brukeren" onclick="window.location.href = \''.URL_ROOT.'/users/delete/'.$info[$type."ID"].'\'">';
         //Contact info
         if(isset($info['contact']) && is_array($info['contact'])){
             echo '<h2>Kontaktinformasjon</h2>';
@@ -444,6 +469,9 @@ function print_info($info){
         }
         echo '</table>';
     }
+    //Button to delete user
+    echo '<h3>Slett</h3><input type="button" value="Slett" onclick="window.location.href = \''.URL_ROOT.$type.'s/delete/'.$info[$type."ID"].'\'">';
+    
     echo "</div>";
     
     display_rfid_script();

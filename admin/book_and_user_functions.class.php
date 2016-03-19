@@ -95,7 +95,7 @@ class CreateUsersAndBooks{
         $update_qry = $this->conn->query($update);
         if($update_qry === TRUE){
             //Success
-            //return true;
+            return true;
         }else{
             //Failed
             $this->error = "Klarte ikke å slette brukeren.";
