@@ -477,22 +477,25 @@ function print_info($info){
     echo '<input type="button" onclick="window.location.href = \''.URL_ROOT.'rfid/create/'.$type.'/'.$info[$type."ID"].'\'" value="Legg til RFID">';
     
     //Lended history
-    echo '<h2>Lånehistorikk</h2>';
-    if(isset($info['lended']) && is_array($info['lended'])){
-        echo '<table cellspacing=0><tr><th>Bruker ID</th><th>Bok ID</th><th>Utlånsdato</th><th>Innleveringsdato</th><th>Innleveringsfrist</th></tr>';
-        foreach($info['lended'] as $lended){
-            echo '<tr>';
-            echo '<td><a href="'.URL_ROOT.'users/info/'.$lended['userID'].'">'.$lended['userID'].'</td>';
-            echo '<td><a href="'.URL_ROOT.'books/info/'.$lended['bookID'].'">'.$lended['bookID'].'</td>';
-            echo '<td>'.$lended['outDate'].'</td>';
-            echo '<td>'.$lended['inDate'].'</td>';
-            echo '<td></td>';
-            echo '</tr>
-            ';
+    if($type == "book" || $type == "user"){
+        echo '<h2>Lånehistorikk</h2>';
+        if(isset($info['lended']) && is_array($info['lended'])){
+            echo '<table cellspacing=0><tr><th>Bruker ID</th><th>Bok ID</th><th>Utlånsdato</th><th>Innleveringsdato</th><th>Innleveringsfrist</th></tr>';
+            foreach($info['lended'] as $lended){
+                echo '<tr>';
+                echo '<td><a href="'.URL_ROOT.'users/info/'.$lended['userID'].'">'.$lended['userID'].'</td>';
+                echo '<td><a href="'.URL_ROOT.'books/info/'.$lended['bookID'].'">'.$lended['bookID'].'</td>';
+                echo '<td>'.$lended['outDate'].'</td>';
+                echo '<td>'.$lended['inDate'].'</td>';
+                echo '<td></td>';
+                echo '</tr>
+                ';
+            }
+            echo '</table>';
         }
-        echo '</table>';
     }
-    //Button to delete user
+    
+    //Button to delete
     echo '<h3>Slett</h3><input type="button" value="Slett" onclick="window.location.href = \''.URL_ROOT.'delete/'.$type.'/'.$info[$type."ID"].'\'">';
     
     echo "</div>";
