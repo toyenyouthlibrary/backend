@@ -51,8 +51,15 @@ class Modify{
             if($key == "RFID"){
                 $or_var = trim($or_var, ";");
             }
+            if($or_var == "null"){
+                $or_var = null;
+            }
             if(isset($original_vars[$field])){
-                $vars .= "`".$field."` = '".$or_var."', ";
+                if($or_var == null){
+                    $vars .= "`".$field."` = NULL, ";
+                }else{
+                    $vars .= "`".$field."` = '".$or_var."', ";
+                }
             }
         }
         $vars = trim($vars, ", ");

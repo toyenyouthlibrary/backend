@@ -373,6 +373,7 @@ if(isset($_GET['index'])){
 }
 
 function print_info($info){
+    $date = (new DateTime())->format('Y-m-d H:i:s');
     echo '<div class="padding" id="details">';
     if(isset($info['userID'])){
         $type = "user";
@@ -396,6 +397,14 @@ function print_info($info){
                         }
                         echo '<option value="'.$i.'" '.$selected.'>'.$descs[$i].'</option>';
                     }
+                    echo '</select></td></tr>';
+                }else if($key == "approved_date"){
+                    echo '<tr><td>Godkjent</td><td><select name="'.$key.'"><option value="null">Ikke godkjent</option>';
+                    $selected = '';
+                    if($inf != null){
+                        $selected = 'selected="selected"';
+                    }
+                    echo '<option value="'.$date.'" '.$selected.'>Godkjent '.$inf.'</option>';
                     echo '</select></td></tr>';
                 }else{
                     echo '<tr>
