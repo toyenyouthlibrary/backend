@@ -79,13 +79,13 @@ for($i = 0; $i < count($books); $i++){
             }
             if($lended){
                 //Deliver book
-                $deliver[] = $book;
                 if($action == 0 || $action == "deliver"){
                     $action = "deliver";
                 }else{
                     j_die($error['only_one_action_allowed']);
                 }
                 $res['type'] = "deliver";
+                $deliver[] = $book;
             }else{
                 if($user != 0){
                     if($action == 0 || $action == "lend"){
