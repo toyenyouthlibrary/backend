@@ -40,6 +40,32 @@ class RFID{
         }
     }
     
+    function search($rfid){
+        $res = array();
+        $select_rfid = "SELECT * FROM lib_RFID WHERE RFID = '".$rfid."'";
+        $select_rfid_qry = $this->conn->query($select_rfid);
+        if($select_rfid_qry->num_rows > 0){
+            if($rfid = $select_rfid_qry->fetch_assoc()){
+                if($rfid['bookID'] != 0){
+                    $res['type'] = 'book';
+                    $res['id'] = $rfid['bookID'];
+                }else if($rfid['userID'] != 0){
+                    $res['type'] = 'user';
+                    $res['id'] = $rfid['userID'];
+                }else if($rfid['shelfID'] != 0){
+                    $res['type'] = 'shelf';
+                    $res['id'] = $rfid['shelfID'];
+                }else{
+                    $this->error = 'Ukjent RFID type.';
+                    return false;
+                }
+                return $res;
+            }
+        }
+        $this->error = 'Fant ikke RFIDen.';
+        return false;
+    }
+    
     function generateRandomString($length = 5) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);

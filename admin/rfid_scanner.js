@@ -32,12 +32,20 @@ $(document).ready(function(){
 });
 
 function tagInput(rfid){
-    if(current_field_id != 0){
-        document.getElementById(current_field_id).getElementsByClassName("new")[0].value = rfid;
-        document.getElementById(current_field_id).getElementsByClassName("p")[0].innerHTML = rfid;
-        document.getElementById(current_field_id).submit();
-        console.log("Barcode is valid");
+    if(action == "default"){
+        if(current_field_id != 0){
+            document.getElementById(current_field_id).getElementsByClassName("new")[0].value = rfid;
+            document.getElementById(current_field_id).getElementsByClassName("p")[0].innerHTML = rfid;
+            document.getElementById(current_field_id).submit();
+            console.log("Barcode is valid");
+        }else{
+            console.log("No RFID selected");
+        }
+    }else if(action == "search"){
+        document.getElementById("formy").getElementsByTagName("input")[0].value = rfid;
+        document.getElementById("formy").submit();
     }
+    
 }
 
 function change_rfid(key){

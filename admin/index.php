@@ -72,6 +72,7 @@ if(isset($_POST['debug'])){
             <li><a href="<?php echo URL_ROOT; ?>users/create">Lag ny</a></li>
         </ul>
         <li><a href="<?php echo URL_ROOT; ?>global">Globalt</a></li>
+        <li><a href="<?php echo URL_ROOT; ?>rfid/search">Søk RFID</a></li>
     </ul>
 </div>
 <div id="body">
@@ -361,12 +362,32 @@ if(isset($_GET['index'])){
                 }else{
                     echo 'Mangler obligatorisk variabel.';
                 }
+            }else if($index_a[1] == 'search'){
+                echo '<div class="padding">';
+                if(!isset($_POST['rfid'])){
+                    //Display info
+                    echo "Skan RFID<form id='formy' action='".URL_ROOT."rfid/search' method='POST'><input type='hidden' name='rfid' /></form>";
+                    display_rfid_script("search");
+                }else{
+                    //Display results
+                    require 'rfid.class.php';
+                    $rfid = new RFID();
+                    $res = $rfid->search($_POST['rfid']);
+                    if($res != false){
+                        header("Location: ".URL_ROOT.$res['type']."s/info/".$res['id']);
+                    }else{
+                        echo "Feilet.<br>".$rfid->error;
+                    }
+                }
+                echo '</div>';
             }else{
                 echo 'Mangler obligatorisk variabel.';
             }
         }else{
-            
+            echo "Mangler obligatorisk variabel.";
         }
+    }else{
+        echo "???";
     }
 }else{
     //Default page
@@ -505,7 +526,8 @@ function printCreateForm($type){
     <?php
 }
 
-function display_rfid_script(){
+function display_rfid_script($action = "default"){
+    echo '<script>var action = "'.$action.'";</script>';
     echo '<script src="rfid_scanner.js"></script>';
 }
 ?>
