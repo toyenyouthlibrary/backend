@@ -60,7 +60,7 @@ $res = array('error' => '');
 $deliver = array();
 $lend = array();
 for($i = 0; $i < count($books); $i++){
-    $get_book = "SELECT bookID, title, author, ISBN10 FROM lib_Book WHERE bookID = '" . $books[$i] . "'";
+    $get_book = "SELECT bookID, title, author, ISBN10 FROM lib_Book WHERE bookID = '" . $books[$i] . "' AND active = 1";
     $get_book_qry = $conn->query($get_book);
     if($get_book_qry->num_rows > 0){
         if($book = $get_book_qry->fetch_assoc()){
@@ -178,7 +178,7 @@ if($where_st != ""){
 //Get username
 $res['username'] = "";
 if($user != 0){
-    $get_username = "SELECT username FROM lib_User WHERE userID = '".$user."'";
+    $get_username = "SELECT username FROM lib_User WHERE userID = '".$user."' AND active = 1";
     $get_username_qry = $conn->query($get_username);
     if($get_username_qry->num_rows > 0){
         if($user = $get_username_qry->fetch_assoc()){
