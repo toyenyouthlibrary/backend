@@ -376,7 +376,8 @@ if(isset($_GET['index'])){
                     if($res != false){
                         header("Location: ".URL_ROOT.$res['type']."s/info/".$res['id']);
                     }else{
-                        echo "Feilet.<br>".$rfid->error;
+                        echo "Feilet.<br>".$rfid->error."<br><br>Prøv å scanne på nytt";
+                        display_rfid_script("search");
                     }
                 }
                 echo '</div>';
