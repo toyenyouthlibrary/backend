@@ -60,7 +60,7 @@ $res = array('error' => '');
 $deliver = array();
 $lend = array();
 for($i = 0; $i < count($books); $i++){
-    $get_book = "SELECT bookID, title, author, ISBN10, ISBN13 FROM lib_Book WHERE bookID = '" . $books[$i] . "' AND active = 1";
+    $get_book = "SELECT bookID, title, author, ISBN10, ISBN13, shelfID FROM lib_Book WHERE bookID = '" . $books[$i] . "' AND active = 1";
     $get_book_qry = $conn->query($get_book);
     if($get_book_qry->num_rows > 0){
         if($book = $get_book_qry->fetch_assoc()){
@@ -191,13 +191,16 @@ if($user != 0){
 echo json_encode($res);
 
 function get_book_info($book){
+    include 'admin/list.class.php';
+    $list = new Lists("shelves");
+    $shelf_name = $list->getShelfName($book['shelfID']);
     return array(
         'title' => $book['title'],
         'author' => $book['author'],
         'ISBN10' => $book['ISBN10'],
         'ISBN13' => $book['ISBN13'],
         'delivery_date' => 'xx.xx.xx',
-        'shelf' => 'xxx'
+        'shelf' => $shelf_name
     );
 }
 ?>
