@@ -3,7 +3,13 @@
 class Lists{
     function __construct($type, $order = null){
         //Connect to db
-        require '../../../koble_til_database.php';
+        $connect = 'koble_til_database.php';
+        if(file_exists('../../../'.$connect)){
+            require '../../../'.$connect;
+        }else if('../../'.$connect){
+            require '../../'.$connect;
+        }
+        
         //Required variables
         $this->conn = $conn;
         $this->type = $type;
