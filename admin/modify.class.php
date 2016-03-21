@@ -17,6 +17,7 @@ class Modify{
                 'title',
                 'original-title',
                 'author',
+                'shelfID',
                 'type',
                 'language'
             );
@@ -40,6 +41,10 @@ class Modify{
         }else if($tbl == 'lib_RFID'){
             $fields = array(
                 'RFID'
+            );
+        }else if($tbl == "lib_Shelf"){
+            $fields = array(
+                'name'
             );
         }else{
             $this->error = "Det er ikke mulig å endre denne tabellen.";

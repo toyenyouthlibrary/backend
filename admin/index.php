@@ -154,6 +154,7 @@ if(isset($_GET['index'])){
                         'Tittel' => 'title',
                         'Original tittel' => 'original-title',
                         'Forfatter' => 'author',
+                        'Hylle' => 'shelfID'
                     )
                 ), 'users' => array(
                     'id' => 'userID',
@@ -162,7 +163,7 @@ if(isset($_GET['index'])){
                         'Navn' => array('firstname', 'lastname'),
                         'Fødselsdato' => 'birth',
                         'Kjønn' => 'sex',
-                        'Skole' => 'school',
+                        'Skole' => 'school'
                     )
                 )
             );
@@ -270,6 +271,9 @@ if(isset($_GET['index'])){
             }else if($index_a[1] == "rfid"){
                 $tbl = "lib_RFID";
                 $return = $index_a[2];
+            }else if($index_a[1] == "shelf"){
+                $tbl = "lib_Shelf";
+                $return = "shelves";
             }
             
             if(isset($tbl)){
@@ -281,7 +285,7 @@ if(isset($_GET['index'])){
                     $update = $mod->update($tbl, array($index_a[1].'ID', $index_a[2]), $_POST);
                 }
                 if($update === true){
-                    header("Location: ".URL_ROOT.$return."/info/".$index_a[3]);
+                    header("Location: ".URL_ROOT."info/".$return."/".$index_a[3]);
                     echo "Vellykket.";
                 }else{
                     echo "Feilet<br>".$mod->error;
@@ -405,7 +409,7 @@ function print_info($info){
     echo '<table cellspacing=0><form method="POST" action="'.URL_ROOT.'modify/'.$type.'/'.$info[$type."ID"].'/'.$info[$type."ID"].'">';
     foreach($info as $key => $inf){
         if(!is_array($inf)){
-            if($key != "userID" && $key != "bookID" && $key != "shelfID" && $key != "username" && $key != "registered"){
+            if($key != "userID" && $key != "bookID" && ($key != "shelfID" || $type == "book") && $key != "username" && $key != "registered"){
                 if($key == "sex"){
                     echo '<tr><td>Kjønn</td><td><select name="'.$key.'">';
                     $descs = array("Ikke spesifisert", "Gutt", "Jente");
@@ -424,6 +428,23 @@ function print_info($info){
                         $selected = 'selected="selected"';
                     }
                     echo '<option value="'.$date.'" '.$selected.'>Godkjent '.$inf.'</option>';
+                    echo '</select></td></tr>';
+                }else if($key == "shelfID" && $type != "shelf"){
+                    $sel = "";
+                    if($inf == 0){
+                        $sel = "selected='selected'";
+                    }
+                    echo '<tr><td>Hylle</td><td><select name="'.$key.'"><option value="0" '.$sel.'>Ingen hylle</option>';
+                    include 'list.class.php';
+                    $_list = new Lists("shelves");
+                    $list = $_list->getList();
+                    foreach($list as $shelf){
+                        $selected = "";
+                        if($inf == $shelf['shelfID']){
+                            $selected = "selected='selected'";
+                        }
+                        echo '<option value="'.$shelf['shelfID'].'" '.$selected.'>'.$shelf['name'].'</option>';
+                    }
                     echo '</select></td></tr>';
                 }else{
                     echo '<tr>

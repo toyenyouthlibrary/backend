@@ -22,8 +22,9 @@ class Info{
                 'original-title',
                 'author',
                 'type',
+                'shelfID',
                 'language',
-                'registered'
+                'registered',
             );
         }else if($type == "users"){
             $active_required = true;

@@ -29,7 +29,8 @@ class Lists{
                 'ISBN13',
                 'title',
                 'author',
-                'original-title'
+                'original-title',
+                'shelfID'
             );
         }else if($type == "users"){
             $active_required = true;
@@ -70,11 +71,28 @@ class Lists{
             while($list_item = $get_list_qry->fetch_assoc()){
                 $temp_res = array();
                 foreach($this->fields as $field){
-                    $temp_res[$field] = $list_item[$field];
+                    if($field == "shelfID" && $this->type == "books"){
+                        $temp_res[$field] = $this->getShelfName($list_item[$field]);
+                    }else{
+                        $temp_res[$field] = $list_item[$field];
+                    }
                 }
                 $res[] = $temp_res;
             }
         }
         return $res;
+    }
+    
+    function getShelfName($shelfID){
+        if($shelfID != 0){
+            $get_shelf = "SELECT name FROM lib_Shelf WHERE shelfID = '".$shelfID."' LIMIT 1";
+            $get_shelf_qry = $this->conn->query($get_shelf);
+            if($get_shelf_qry->num_rows > 0){
+                if($shelf = $get_shelf_qry->fetch_assoc()){
+                    return $shelf['name'];
+                }
+            }
+        }
+        return "Ingen hylle";
     }
 }
