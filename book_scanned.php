@@ -30,13 +30,13 @@ $rfid_arr = explode(";", $vars['rfid']);
 require 'rfid.class.php';
 $rfid = new RFID();
 
-$user = 0;
+$user = -1;
 $books = array();
 for($i = 0; $i < count($rfid_arr); $i++){
     $res = $rfid->type($rfid_arr[$i]);
     if($res[0] == 'user'){
-        if($user == 0){
-            $user = $rfid_arr[$i];
+        if($user == -1){
+            $user = $res[1];
         }else{
             //Two user RFID's are selected
             j_die($error['multiple_user_rfid']);
@@ -60,7 +60,7 @@ $res = array('error' => '');
 $deliver = array();
 $lend = array();
 for($i = 0; $i < count($books); $i++){
-    $get_book = "SELECT bookID, title, author, ISBN10 FROM lib_Book WHERE bookID = '" . $books[$i] . "' AND active = 1";
+    $get_book = "SELECT bookID, title, author, ISBN10, ISBN13 FROM lib_Book WHERE bookID = '" . $books[$i] . "' AND active = 1";
     $get_book_qry = $conn->query($get_book);
     if($get_book_qry->num_rows > 0){
         if($book = $get_book_qry->fetch_assoc()){
@@ -73,13 +73,13 @@ for($i = 0; $i < count($books); $i++){
                     //Entry for the book exists
                     if($book_user['inDate'] == null){
                         $lended = true;
+                        $user = $book_user['userID'];
                     }
-                    $user = $book_user['userID'];
                 }
             }
             if($lended){
                 //Deliver book
-                if($action == 0 || $action == "deliver"){
+                if($action !== "lend"){
                     $action = "deliver";
                 }else{
                     j_die($error['only_one_action_allowed']);
@@ -87,12 +87,13 @@ for($i = 0; $i < count($books); $i++){
                 $res['type'] = "deliver";
                 $deliver[] = $book;
             }else{
-                if($user != 0){
-                    if($action == 0 || $action == "lend"){
-                        $action = "lend";
-                    }else{
-                        j_die($error['only_one_action_allowed']);
-                    }
+                if($action !== "deliver"){
+                    $action = "lend";
+                }else{
+                    j_die($error['only_one_action_allowed']);
+                }
+                
+                if($user != -1){
                     //Lend book
                     $lend[] = array(
                         'user' => $user,
@@ -154,7 +155,7 @@ for($i = 0; $i < count($deliver); $i++){
     }
 }
 if($where_st != ""){
-    $deliver_books = "UPDATE lib_User_Book SET inDate = '" . $date . "' " . $where_st . " ORDER BY bookID DESC LIMIT 1";
+    $deliver_books = "UPDATE lib_User_Book SET inDate = '" . $date . "' " . $where_st . " ORDER BY user_book_ID DESC LIMIT 1";
     $deliver_books_qry = $conn->query($deliver_books);
     if ($deliver_books_qry === TRUE) {
         //Success
