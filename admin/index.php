@@ -72,6 +72,9 @@ if(isset($_POST['debug'])){
             <li><a href="<?php echo URL_ROOT; ?>create/user">Lag ny</a></li>
         </ul>
         <li><a href="<?php echo URL_ROOT; ?>list/shelves">Hyller</a></li>
+        <ul>
+            <li><a href="<?php echo URL_ROOT; ?>create/shelf">Lag ny</a></li>
+        </ul>
         <li><a href="<?php echo URL_ROOT; ?>global">Globalt</a></li>
         <li><a href="<?php echo URL_ROOT; ?>rfid/search">Søk RFID</a></li>
     </ul>
@@ -215,6 +218,8 @@ if(isset($_GET['index'])){
                     
                 ), 'user' => array(
                     'verifyer' => 'firstname'
+                ), 'shelf' => array(
+                    'verifyer' => 'name'
                 )
             );
             if(isset($fields[$index_a[1]])){
@@ -223,7 +228,7 @@ if(isset($_GET['index'])){
                     $create = new CreateUsersAndBooks($index_a[1]);
                     $new = $create->add($_POST);
                     if($new != false){
-                        header("Location: ".URL_ROOT."info/".$index_a[1]."s/".$new);
+                        header("Location: ".URL_ROOT."info/".get_plural($index_a[1])."/".$new);
                         echo "Vellykket.";
                     }else{
                         echo "Feilet<br>".$create->error;
@@ -242,7 +247,7 @@ if(isset($_GET['index'])){
                 $delete = new CreateUsersAndBooks($index_a[1]);
                 $del = $delete->delete($index_a[2]);
                 if($del == true){
-                    header("Location: ".URL_ROOT."list/".$index_a[1]."s");
+                    header("Location: ".URL_ROOT."list/".get_plural($index_a[1]));
                     echo "Vellykket.";
                 }else{
                     echo "Feilet<br>".$delete->error;
@@ -515,7 +520,7 @@ function printCreateForm($type){
         echo '<tr><td>'.$field.'</td><td><input type="text" maxlength=300 name="'.$field.'" /></td></tr>';
     }
     ?>
-    <tr><td colspan=2><button><?php if($type == "user"){ echo "Lag bruker"; }else{ echo "Last opp bok";}?></button></td></tr>
+    <tr><td colspan=2><button><?php if($type == "user"){echo "Lag bruker";}else if($type == "book"){echo "Last opp bok";}else{echo "Registrer hylle";} ?></button></td></tr>
     </table>
     </form>
     </div>

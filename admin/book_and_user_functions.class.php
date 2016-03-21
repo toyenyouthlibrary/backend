@@ -10,6 +10,9 @@ class CreateUsersAndBooks{
         $this->type = $type;
         
         if($type == "book"){
+            $active_required = true;
+            $this->delete_4real = false;
+            $this->log_registered = true;
             $this->tbl = "lib_Book";
             $this->fields = array(
                 'ISBN10',
@@ -21,17 +24,33 @@ class CreateUsersAndBooks{
                 'language',
             );
         }else if($type == "user"){
+            $active_required = true;
+            $this->delete_4real = false;
+            $this->log_registered = true;
             $this->tbl = "lib_User";
             $this->fields = array(
-            'username',
-            'firstname',
-            'lastname',
-            'birth',
-            'address_nr',
-            'school',
-            'address',
-            'pin'
-        );
+                'username',
+                'firstname',
+                'lastname',
+                'birth',
+                'address_nr',
+                'school',
+                'address',
+                'pin'
+            );
+        }else if($type == "shelf"){
+            $active_required = false;
+            $this->delete_4real = true;
+            $this->log_registered = false;
+            $this->tbl = "lib_Shelf";
+            $this->fields = array(
+                'name'
+            );
+        }
+        
+        $this->active = "";
+        if($active_required){
+            $this->active = "AND active = '1'";
         }
     }
     
@@ -49,8 +68,13 @@ class CreateUsersAndBooks{
             }
         }
         
-        $fields .= "registered";
-        $vars .= "'".$date."'";
+        if($this->log_registered){
+            $fields .= "registered";
+            $vars .= "'".$date."'";
+        }
+        
+        $fields = trim($fields, ",");
+        $vars = trim($vars, ",");
         
         //Check if the user exists
         if($this->type == "user"){
@@ -64,42 +88,57 @@ class CreateUsersAndBooks{
             }
         }
         
-        //Insert new user
-        $insert_user =
+        //Insert new row
+        $insert_row =
             "INSERT INTO $this->tbl ($fields) VALUES ($vars)";
-        $insert_user_result = $this->conn->query($insert_user);
-        if ($insert_user_result===TRUE) {
+        $insert_row_result = $this->conn->query($insert_row);
+        if ($insert_row_result===TRUE) {
             //Success
-            $select_user = "SELECT ".$this->type."ID FROM $this->tbl WHERE ".$this->fields[0]." = '".$original_variables[$this->fields[0]]."' AND active = 1 ORDER BY ".$this->type."ID DESC";
-            $select_user_qry = $this->conn->query($select_user);
-            if($select_user_qry->num_rows > 0){
-                if($user = $select_user_qry->fetch_assoc()){
-                    if(isset($user['userID'])){
-                        return $user['userID'];
-                    }else{
-                        return $user['bookID'];
+            $select_row = "SELECT ".$this->type."ID FROM $this->tbl WHERE ".$this->fields[0]." = '".$original_variables[$this->fields[0]]."' ".$this->active." ORDER BY ".$this->type."ID DESC";
+            $select_row_qry = $this->conn->query($select_row);
+            if($select_row_qry->num_rows > 0){
+                if($row = $select_row_qry->fetch_assoc()){
+                    if(isset($row['userID'])){
+                        return $row['userID'];
+                    }else if(isset($row['bookID'])){
+                        return $row['bookID'];
+                    }else if(isset($row['shelfID'])){
+                        return $row['shelfID'];
                     }
                 }
             }
             $this->error = "Fant ikke brukeren.";
         }else{
             $this->error = "Klarte ikke å lage ny bruker.";
-            echo $insert_user;
+            echo $insert_row;
             echo $this->conn->error;
         }
         return false;
     }
     
     function delete($id){
-        $update = "UPDATE $this->tbl SET active = '0' WHERE ".$this->type."ID = '".$id."'";
-        $update_qry = $this->conn->query($update);
-        if($update_qry === TRUE){
-            //Success
-            return true;
+        if($this->delete_4real){
+            $delete_row = "DELETE FROM $this->tbl WHERE ".$this->type."ID = '".$id."'";
+            $delete_row_res = $this->conn->query($delete_row);
+            $this->error = $delete_row_res;
+            $this->msg = $this->conn->affected_rows;
+            if($this->conn->affected_rows > 0){
+                return true;
+            }else{
+                $this->error = "Klarte ikke å slette hyllen (mulig at den allerede er slettet?)";
+                return false;
+            }
         }else{
-            //Failed
-            $this->error = "Klarte ikke å slette brukeren.";
-            return false;
+            $update = "UPDATE $this->tbl SET active = '0' WHERE ".$this->type."ID = '".$id."'";
+            $update_qry = $this->conn->query($update);
+            if($update_qry === TRUE){
+                //Success
+                return true;
+            }else{
+                //Failed
+                $this->error = "Klarte ikke å slette brukeren.";
+                return false;
+            }
         }
         
         return false;
