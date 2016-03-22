@@ -509,8 +509,8 @@ function print_info($info){
             echo '<table cellspacing=0><tr><th>Bruker ID</th><th>Bok ID</th><th>Utlånsdato</th><th>Innleveringsdato</th><th>Innleveringsfrist</th></tr>';
             foreach($info['lended'] as $lended){
                 echo '<tr>';
-                echo '<td><a href="'.URL_ROOT.'users/info/'.$lended['userID'].'">'.$lended['userID'].'</td>';
-                echo '<td><a href="'.URL_ROOT.'books/info/'.$lended['bookID'].'">'.$lended['bookID'].'</td>';
+                echo '<td><a href="'.URL_ROOT.'info/users/'.$lended['userID'].'">'.$lended['userID'].'</td>';
+                echo '<td><a href="'.URL_ROOT.'info/books/'.$lended['bookID'].'">'.$lended['bookID'].'</td>';
                 echo '<td>'.$lended['outDate'].'</td>';
                 echo '<td>'.$lended['inDate'].'</td>';
                 echo '<td></td>';
