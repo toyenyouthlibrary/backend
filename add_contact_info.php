@@ -12,13 +12,14 @@ $error = array(
     'failed_to_save_contact_info' => 'Klarte ikke &aring; linke kontaktinformasjonen med brukeren.'
 );
 
-if(!isset($_POST['username']) || !isset($_POST['phone']) || !isset($_POST['email'])){
+if(!isset($_POST['username']) || !isset($_POST['phone']) || !isset($_POST['email']) || !isset($_POST['comment'])){
     j_die($error['missing_info']);
 }
 
 $username = $_POST["username"];
 $phone = $_POST["phone"];
 $email = $_POST['email'];
+$comment = $_POST['comment'];
 
 /*
  * variabelen $conn er hentet fra koble_til_database.php
@@ -39,8 +40,8 @@ if ($test_uname_result->num_rows != 0) {
 
 //oppretter en standardbruker, uten ekstra kontaktinfo
 $insert_user=
-    "INSERT INTO lib_Contact (phone, email) VALUES
-    ('".$phone."', '".$email."')";
+    "INSERT INTO lib_Contact (phone, email, comment) VALUES
+    ('".$phone."', '".$email."', '".$comment."')";
 $insert_user_result = $conn->query($insert_user);
 if ($insert_user_result===TRUE) {
     
