@@ -490,7 +490,7 @@ function print_info($info){
         foreach($info['rfid'] as $key => $rfid){
             echo '<tr><td>';
             //echo '<form action="'.URL_ROOT.'modify/rfid" method="POST" id="rfid_'.$key.'">';
-            echo '<form action="'.URL_ROOT.'modify/rfid/'.$type.'s/'.$info[$type."ID"].'" method="POST" id="rfid_'.$key.'">';
+            echo '<form action="'.URL_ROOT.'modify/rfid/'.get_plural($type).'/'.$info[$type."ID"].'" method="POST" id="rfid_'.$key.'">';
             echo '<p class="p">'.$rfid.'</p>';
             echo '<input type="hidden" name="original" class="original" value="'.$rfid.'" />';
             echo '<input type="hidden" name="new" class="new" /></form></td>';
