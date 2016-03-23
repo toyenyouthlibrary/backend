@@ -225,6 +225,9 @@ if(isset($_GET['index'])){
             );
             if(isset($fields[$index_a[1]])){
                 if(isset($_POST[$fields[$index_a[1]]['verifyer']])){
+                    //Fix the birth
+                    $_POST['birth'] = $_POST['birth_year']."-".$_POST['birth_month']."-".$_POST['birth_day']." 00:00:00";
+                    
                     require 'book_and_user_functions.class.php';
                     $create = new CreateUsersAndBooks($index_a[1]);
                     $new = $create->add($_POST);
@@ -265,6 +268,8 @@ if(isset($_GET['index'])){
             }else if($index_a[1] == "user"){
                 $tbl = "lib_User";
                 $return = "users";
+                //Fix the birth
+                $_POST['birth'] = $_POST['birth_year']."-".$_POST['birth_month']."-".$_POST['birth_day']." 00:00:00";
             }else if($index_a[1] == "contact"){
                 $tbl = "lib_Contact";
                 $return = "users";
@@ -446,6 +451,40 @@ function print_info($info){
                         echo '<option value="'.$shelf['shelfID'].'" '.$selected.'>'.$shelf['name'].'</option>';
                     }
                     echo '</select></td></tr>';
+                }else if($key == 'birth'){
+                    $datee = explode(" ", $inf)[0];
+                    $date = explode("-", $datee);
+                    echo '<tr><td>Fødselsdag</td><td><select name="'.$key.'_day">';
+                    for($i = 1; $i <= 31; $i++){
+                        if($i < 10){
+                            $i = '0'.$i;
+                        }
+                        $selected = '';
+                        if($i."" == "".$date[2]){
+                            $selected = 'selected="selected"';
+                        }
+                        echo "<option value='$i' $selected>".$i."</option>";
+                    }
+                    echo '</select> <select name="'.$key.'_month">';
+                    for($i = 1; $i <= 12; $i++){
+                        if($i < 10){
+                            $i = '0'.$i;
+                        }
+                        $selected = '';
+                        if($i."" == "".$date[1]){
+                            $selected = 'selected="selected"';
+                        }
+                        echo "<option value='$i' $selected>".$i."</option>";
+                    }
+                    echo '</select> <select name="'.$key.'_year">';
+                    for($i = (int) date("Y"); $i >= ((int) date("Y")) - 80; $i--){
+                        $selected = '';
+                        if($i == $date[0]){
+                            $selected = 'selected="selected"';
+                        }
+                        echo "<option value='$i' $selected>".$i."</option>";
+                    }
+                    echo '</select></td></tr>';
                 }else{
                     echo '<tr>
                         <td>'.$key.'</td>
@@ -538,7 +577,29 @@ function printCreateForm($type){
     <table cellspacing=0>
     <?php
     foreach($create->fields as $field){
-        echo '<tr><td>'.$field.'</td><td><input type="text" maxlength=300 name="'.$field.'" /></td></tr>';
+        if($field == 'birth'){
+            echo '<tr><td>Fødselsdag</td><td><select name="'.$field.'_day">';
+            for($i = 1; $i <= 31; $i++){
+                if($i < 10){
+                    $i = '0'.$i;
+                }
+                echo "<option value='$i'>".$i."</option>";
+            }
+            echo '</select> <select name="'.$field.'_month">';
+            for($i = 1; $i <= 12; $i++){
+                if($i < 10){
+                    $i = '0'.$i;
+                }
+                echo "<option value='$i'>".$i."</option>";
+            }
+            echo '</select> <select name="'.$field.'_year">';
+            for($i = (int) date("Y"); $i >= ((int) date("Y")) - 80; $i--){
+                echo "<option value='$i'>".$i."</option>";
+            }
+            echo '</select></td></tr>';
+        }else{
+            echo '<tr><td>'.$field.'</td><td><input type="text" maxlength=300 name="'.$field.'" /></td></tr>';
+        }
     }
     ?>
     <tr><td colspan=2><button><?php if($type == "user"){echo "Lag bruker";}else if($type == "book"){echo "Last opp bok";}else{echo "Registrer hylle";} ?></button></td></tr>

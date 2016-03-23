@@ -79,6 +79,8 @@ class Lists{
                 foreach($this->fields as $field){
                     if($field == "shelfID" && $this->type == "books"){
                         $temp_res[$field] = $this->getShelfName($list_item[$field]);
+                    }else if($field == "birth"){
+                        $temp_res[$field] = explode(" ", $list_item[$field])[0];
                     }else{
                         $temp_res[$field] = $list_item[$field];
                     }
