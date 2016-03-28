@@ -1,4 +1,5 @@
 <?php
+define("ROOT", getcwd()."..\\");
 require '../../../koble_til_database.php';
 session_start();
 //Fech the user credentials from file that is not publicly available ^_^
