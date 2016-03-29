@@ -37,7 +37,7 @@ for($i = 0; $i < count($rfid_arr); $i++){
             j_die($error['multiple_shelf_rfid']);
         }
     }else if($_res[0] == 'book'){
-        $book_ids[] = $_res[1];
+        $book_ids[] = $rfid_arr[$i];
     }
 }
 
@@ -49,7 +49,7 @@ if($shelf == -1){
     j_die($error['no_shelf']);
 }
 
-foreach($book_ids as $book_id){
+foreach($book_ids as $book_rfid){
     /*$get_book = "SELECT * FROM lib_Book WHERE bookID = '".$book_id."'";
     $get_book_qry = $conn->query($get_book);
     if($get_book_qry->num_rows > 0){
@@ -57,7 +57,7 @@ foreach($book_ids as $book_id){
             
         }
     }*/
-    $update_book = "UPDATE lib_Book SET shelfID = '".$shelf."' WHERE bookID = '".$book_id."'";
+    $update_book = "UPDATE lib_RFID SET `_shelfID` = '".$shelf."' WHERE RFID = '".$book_rfid."'";
     $update_book_qry = $conn->query($update_book);
     if ($update_book_qry === TRUE) {
         //Success

@@ -6,7 +6,7 @@ class Lists{
         $connect = 'koble_til_database.php';
         if(file_exists('../../../'.$connect)){
             require '../../../'.$connect;
-        }else if('../../'.$connect){
+        }else if(file_exists('../../'.$connect)){
             require '../../'.$connect;
         }
         
@@ -35,8 +35,7 @@ class Lists{
                 'ISBN13',
                 'title',
                 'author',
-                'original-title',
-                'shelfID'
+                'original-title'
             );
         }else if($type == "users"){
             $active_required = true;
@@ -57,7 +56,7 @@ class Lists{
             $active_required = false;
             $this->tbl = "lib_Shelf";
             $this->fields = array(
-                'shelfID',
+                'shelfNR',
                 'name'
             );
         }

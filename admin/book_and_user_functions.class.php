@@ -44,6 +44,7 @@ class CreateUsersAndBooks{
             $this->log_registered = false;
             $this->tbl = "lib_Shelf";
             $this->fields = array(
+                'shelfNR',
                 'name'
             );
         }

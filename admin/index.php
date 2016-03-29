@@ -1,9 +1,10 @@
 <?php
-define("ROOT", getcwd()."..\\");
-require '../../../koble_til_database.php';
+define("SLASH", "/");
+define("ROOT", getcwd().SLASH."..".SLASH);
+require '..'.SLASH.'..'.SLASH.'..'.SLASH.'koble_til_database.php';
 session_start();
 //Fech the user credentials from file that is not publicly available ^_^
-require '../../../admin_credentials.php';
+require '..'.SLASH.'..'.SLASH.'..'.SLASH.'admin_credentials.php';
 
 //Initialize result array with the part that will always be the same
 $res = array('error' => '');
@@ -76,7 +77,7 @@ if(isset($_POST['debug'])){
         <ul>
             <li><a href="<?php echo URL_ROOT; ?>create/shelf">Lag ny</a></li>
         </ul>
-        <li><a href="<?php echo URL_ROOT; ?>global">Globalt</a></li>
+        <!--<li><a href="<?php echo URL_ROOT; ?>global">Globalt</a></li>-->
         <li><a href="<?php echo URL_ROOT; ?>rfid/search">Søk RFID</a></li>
     </ul>
 </div>
@@ -142,9 +143,9 @@ if(isset($_GET['index'])){
         if(isset($index_a[1])){
             $fields = array(
                 'shelves' => array(
-                    'id' => 'shelfID',
+                    'id' => 'shelfNR',
                     'fields' => array(
-                        'ID' => 'shelfID',
+                        'ID' => 'shelfNR',
                         'Navn' => 'name'
                     )
                 ), 'books' => array(
@@ -154,8 +155,7 @@ if(isset($_GET['index'])){
                         'ISBN 13' => 'ISBN13',
                         'Tittel' => 'title',
                         'Original tittel' => 'original-title',
-                        'Forfatter' => 'author',
-                        'Hylle' => 'shelfID'
+                        'Forfatter' => 'author'
                     )
                 ), 'users' => array(
                     'id' => 'userID',
@@ -217,7 +217,6 @@ if(isset($_GET['index'])){
             $fields = array(
                 'book' => array(
                     'verifyer' => 'title'
-                    
                 ), 'user' => array(
                     'verifyer' => 'firstname'
                 ), 'shelf' => array(
@@ -286,7 +285,7 @@ if(isset($_GET['index'])){
                 require 'modify.class.php';
                 $mod = new Modify();
                 if($tbl == "lib_RFID"){
-                    $update = $mod->update($tbl, array("RFID", $_POST['original']), array('RFID' => $_POST['new']));
+                    $update = $mod->update($tbl, array("RFID", $_POST['original']), array('RFID' => $_POST['new'], '_shelfID' => $_POST['_shelfID']));
                 }else{
                     $update = $mod->update($tbl, array($index_a[1].'ID', $index_a[2]), $_POST);
                 }
@@ -405,7 +404,7 @@ function print_info($info){
     }else if(isset($info['bookID'])){
         $type = "book";
         echo '<h2>Bokinformasjon</h2>';
-    }else if(isset($info['shelfID'])){
+    }else if(isset($info['shelfID']) || isset($info['shelfNR'])){
         $type = "shelf";
         echo '<h2>Hylle informasjon</h2>';
     }else{
@@ -430,10 +429,12 @@ function print_info($info){
                 }else if($key == "approved_date"){
                     echo '<tr><td>Godkjent</td><td><select name="'.$key.'"><option value="null">Ikke godkjent</option>';
                     $selected = '';
+                    $approved_date = date("Y-m-d H:i:s");
                     if($inf != null){
                         $selected = 'selected="selected"';
+                        $approved_date = $inf;
                     }
-                    echo '<option value="'.$date.'" '.$selected.'>Godkjent '.$inf.'</option>';
+                    echo '<option value="'.$approved_date.'" '.$selected.'>Godkjent '.$inf.'</option>';
                     echo '</select></td></tr>';
                 }else if($key == "shelfID" && $type != "shelf"){
                     $sel = "";
@@ -486,6 +487,16 @@ function print_info($info){
                         echo "<option value='$i' $selected>".$i."</option>";
                     }
                     echo '</select></td></tr>';
+                }else if($key == "type"){
+                    echo '<tr><td>Type</td><td><select name="'.$key.'">';
+                    $types = array('blad', 'bok', 'film', 'lydbok');
+                    foreach($types as $typi){ $selected = ''; if($inf == $typi){$selected = 'selected="selected"';} echo "<option value='$typi' $selected>$typi</option>"; }
+                    echo '</select></td></tr>';
+                }else if($key == "language"){
+                    echo '<tr><td>Språk</td><td><select name="'.$key.'">';
+                    $languages = array('Engelsk', 'Norsk');
+                    foreach($languages as $lang){ $selected = ''; if($inf == $lang){$selected = 'selected="selected"';} echo "<option value='$lang' $selected>$lang</option>"; }
+                    echo '</select></td></tr>';
                 }else{
                     echo '<tr>
                         <td>'.$key.'</td>
@@ -531,12 +542,30 @@ function print_info($info){
             echo '<tr><td>';
             //echo '<form action="'.URL_ROOT.'modify/rfid" method="POST" id="rfid_'.$key.'">';
             echo '<form action="'.URL_ROOT.'modify/rfid/'.get_plural($type).'/'.$info[$type."ID"].'" method="POST" id="rfid_'.$key.'">';
-            echo '<p class="p">'.$rfid.'</p>';
-            echo '<input type="hidden" name="original" class="original" value="'.$rfid.'" />';
-            echo '<input type="hidden" name="new" class="new" /></form></td>';
-            echo '<td><input type="button" value="Endre" onclick="change_rfid('.$key.')" /> <input type="button" value="Slett" onclick="window.location.href=\''.URL_ROOT.'rfid/delete/'.$rfid.'/'.$type.'/'.$info[$type."ID"].'\'" /></td>';
-            echo '</tr>
-            ';
+            echo '<p class="p '.$rfid[0].'" style="display:inline;">'.$rfid[0].'</p>';
+            echo '<input type="hidden" name="original" class="original" value="'.$rfid[0].'" />';
+            echo '<input type="hidden" name="new" class="new" /><input type="hidden" name="_shelfID" value="'.$rfid[2].'" />';
+            echo '</form></td>';
+            echo '<td style="border-right: 1px solid black;"><input type="button" value="Endre" onclick="change_rfid('.$key.')" /> <input type="button" value="Slett" onclick="window.location.href=\''.URL_ROOT.'rfid/delete/'.$rfid[0].'/'.$type.'/'.$info[$type."ID"].'\'" /></td>';
+            if($type == "book"){
+                echo '<td><form action="'.URL_ROOT.'modify/rfid/'.get_plural($type).'/'.$info[$type."ID"].'" method="POST">';
+                echo '<select style="display:inline;" name="_shelfID">';
+                $selected = ''; if($rfid[2] == 0){ $selected = "selected='selected'"; }
+                echo '<option value="0" '.$selected.'>Ingen Hylle.</option>';
+                require ROOT.'../../koble_til_database.php';
+                $get_shelves = "SELECT * FROM lib_Shelf";
+                $get_shelves_qry = $conn->query($get_shelves);
+                if($get_shelves_qry->num_rows > 0){
+                    while($shelf = $get_shelves_qry->fetch_assoc()){
+                        $selected = ''; if($shelf['shelfID'] == $rfid[2]){ $selected = 'selected="selected"'; }
+                        echo '<option value="'.$shelf['shelfID'].'" '.$selected.'>'.$shelf['shelfNR'].' - '.$shelf['name'].'</option>';
+                    }
+                }
+                echo '</select><input type="hidden" name="original" value="'.$rfid[0].'" />';
+                echo '<input type="hidden" name="new" value="'.$rfid[0].'" />';
+                echo ' <button>Oppdater</button></form></td>';
+            }
+            echo '</tr>';
         }
         echo '</table>';
     }
@@ -546,11 +575,12 @@ function print_info($info){
     if($type == "book" || $type == "user"){
         echo '<h2>Lånehistorikk</h2>';
         if(isset($info['lended']) && is_array($info['lended'])){
-            echo '<table cellspacing=0><tr><th>Bruker ID</th><th>Bok ID</th><th>Utlånsdato</th><th>Innleveringsdato</th><th>Innleveringsfrist</th></tr>';
+            echo '<table cellspacing=0><tr><th>Bok RFID</th><th>Bruker ID</th><th>Bok ID</th><th>Utlånsdato</th><th>Innleveringsdato</th><th>Innleveringsfrist</th></tr>';
             foreach($info['lended'] as $lended){
                 echo '<tr>';
-                echo '<td><a href="'.URL_ROOT.'info/users/'.$lended['userID'].'">'.$lended['userID'].'</td>';
-                echo '<td><a href="'.URL_ROOT.'info/books/'.$lended['bookID'].'">'.$lended['bookID'].'</td>';
+                echo '<td><a href="'.URL_ROOT.'info/books/'.$lended['bookID'].'#'.$lended['bookRFID'].'" class="'.$lended['bookRFID'].'">'.$lended['bookRFID'].'</a></td>';
+                echo '<td><a href="'.URL_ROOT.'info/users/'.$lended['userID'].'">'.$lended['userID'].'</a></td>';
+                echo '<td><a href="'.URL_ROOT.'info/books/'.$lended['bookID'].'#'.$lended['bookRFID'].'">'.$lended['bookID'].'</a></td>';
                 echo '<td>'.$lended['outDate'].'</td>';
                 echo '<td>'.$lended['inDate'].'</td>';
                 echo '<td></td>';
@@ -566,6 +596,7 @@ function print_info($info){
     
     echo "</div>";
     
+    display_select_rfid_script();
     display_rfid_script();
 }
 
@@ -598,6 +629,16 @@ function printCreateForm($type){
                 echo "<option value='$i'>".$i."</option>";
             }
             echo '</select></td></tr>';
+        }else if($field == 'type'){
+            echo '<tr><td>Type</td><td><select name="'.$field.'">';
+            $types = array('blad', 'bok', 'film', 'lydbok');
+            foreach($types as $type){ echo "<option value='$type'>$type</option>"; }
+            echo '</select></td></tr>';
+        }else if($field == 'language'){
+            echo '<tr><td>Språk</td><td><select name="'.$field.'">';
+            $languages = array('Engelsk', 'Norsk');
+            foreach($languages as $lang){ $selected = ''; if($inf == $lang){$selected = 'selected="selected"';} echo "<option value='$lang' $selected>$lang</option>"; }
+            echo '</select></td></tr>';
         }else{
             echo '<tr><td>'.$field.'</td><td><input type="text" maxlength=300 name="'.$field.'" /></td></tr>';
         }
@@ -613,6 +654,9 @@ function printCreateForm($type){
 function display_rfid_script($action = "default"){
     echo '<script>var action = "'.$action.'";</script>';
     echo '<script src="rfid_scanner.js"></script>';
+}
+function display_select_rfid_script(){
+    echo '<script src="select_rfid.js"></script>';
 }
 
 function get_plural($type){

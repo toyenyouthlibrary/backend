@@ -11,7 +11,7 @@ class RFID{
         if($get_rfid_qry->num_rows > 0){
             if($rfid = $get_rfid_qry->fetch_assoc()){
                 if($rfid['bookID'] != 0){
-                    return array('book', $rfid['bookID']);
+                    return array('book', $rfid['bookID'], $rfid['_shelfID']);
                 }else if($rfid['userID'] != 0){
                     return array('user', $rfid['userID']);
                 }else if($rfid['shelfID'] != 0){

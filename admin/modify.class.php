@@ -40,11 +40,13 @@ class Modify{
             );
         }else if($tbl == 'lib_RFID'){
             $fields = array(
-                'RFID'
+                'RFID',
+                '_shelfID'
             );
         }else if($tbl == "lib_Shelf"){
             $fields = array(
-                'name'
+                'name',
+                'shelfNR'
             );
         }else{
             $this->error = "Det er ikke mulig å endre denne tabellen.";

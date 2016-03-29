@@ -63,7 +63,7 @@ input{
     <h2><img src="<?php echo DEPENDENCIES_LOC; ?>imgs/magnifier.png" /> Resultater</h2>
 <?php
     //If the user has searched some shit
-    require DEPENDENCIES_URL.'..\search.class.php';
+    require ROOT.'search.class.php';
     $search = new Search($_POST['search']);
     if($search->error == ''){
         ?>
@@ -81,7 +81,6 @@ input{
             echo '<td>'.$res['title'].'</td>';
             echo '<td>'.$res['author'].'</td>';
             echo '<td>'.$res['language'].'</td>';
-            echo '<td>'.$res['shelfID'].'</td>';
             echo '</tr>';
         }
         ?>
@@ -102,7 +101,7 @@ input{
 </div>
 <?php
 }else if(isset($_GET['book'])){
-    require ROOT.'admin/info.class.php';
+    require ROOT.'admin'.SLASH.'info.class.php';
     $info = new Info("books", $_GET['book']);
     $i = $info->getInfo();
     $author = $i['author'];
@@ -154,8 +153,30 @@ input{
         </div>
     </div><div id="info">
         <h3><?php echo $i['title']; ?>, <?php echo $author; ?>.</h3>
-        <i>Synopsis</i>
-        <p>Hylle: <?php echo $i['shelfID']; ?>. Status: xx.</p>
+        <i>Synopsis</i><?php
+            //Include the list class to get the shelf name
+            include ROOT.'admin/list.class.php';
+            $lists = new Lists("shelves");
+            //Include the scan_book class to get the book status
+            require ROOT.'scan_book.class.php';
+            $sb = new ScanBook();
+            //
+            require ROOT.'../../koble_til_database.php';
+            $get_books = "SELECT * FROM lib_RFID WHERE bookID = '".$i['bookID']."'";
+            $get_books_qry = $conn->query($get_books);
+            if($get_books_qry->num_rows > 0){
+                while($book = $get_books_qry->fetch_assoc()){
+                    echo '<p>Hylle: '.$lists->getShelfName($book['_shelfID']).". Status: ";
+                    //Check if book is lended
+                    if($sb->isLended($book['RFID'])){
+                        echo 'Lånt ut';
+                    }else{
+                        echo 'Innlevert';
+                    }
+                    echo ".</p>";
+                }
+            }
+        ?>
     </div>
 </div>
 <div id="footnotes" class="bottom_left">
@@ -164,7 +185,7 @@ input{
 <div id="footnotes" class="bottom_right">
     <img src="<?php echo DEPENDENCIES_LOC; ?>imgs/soke_p.png" />
 </div>
-    <?php
+    <?php 
 }else{
     echo "Ops.. Her har det skjedd noe feil.";
 }
