@@ -8,7 +8,7 @@ $error = array(
     'unknown_feedback' => 'Den etterspurte typen feedback er ikke akseptert.',
     'empty_comment' => 'Kan ikke lagre tomme kommentarer.',
     'not_int' => 'Stjernevurdering m&aring; sendes som et tall.',
-    'unaccepted_int' => 'Stjernevurderinger m&aring; v&aelig;re mellom 1 og 10.',
+    'unaccepted_int' => 'Stjernevurderinger m&aring; v&aelig;re mellom 1 og 6.',
     'nonexistant_user' => 'Den etterspurte brukeren finnes ikke.',
     'nonexistant_book' => 'Den etterspurte boken finnes ikke.',
     'failed_save' => 'Klarte ikke &aring; lagre feedback.',
@@ -27,6 +27,10 @@ $value = $_POST['value'];
 //Verify the type of feedback
 if(!($type == "comment" || $type == "star")){
     j_die($error['unknown_feedback']);
+}
+
+if(($type == "star" && $value == 0) || $value == ""){
+    j_die("");
 }
 
 //Verify the RFIDs
@@ -66,13 +70,13 @@ if($type == "comment"){
     if(!is_numeric($value)){
         j_die($error['not_int']);
     }else{
-        if(intval($value) > 10 || intval($value) < 1){
+        if(intval($value) > 6 || intval($value) < 0){
             j_die($error['unaccepted_int']);
         }
     }
 }
 
-//Save the comment
+//Save the feedback
 $date= (new DateTime())->format('Y-m-d H:i:s');
 
 $save_feedback = "INSERT INTO lib_Feedback (user_rfid, book_rfid, type, value, timestamp) VALUES ('".$user."', '".$book."', '".$type."', '".$value."', '".$date."')";
