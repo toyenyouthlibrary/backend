@@ -13,6 +13,7 @@ class Info{
         if($type == "books"){
             $active_required = true;
             $this->id_field = "bookID";
+            $this->history_id_field = "bookRFID";
             $this->tbl = "lib_Book";
             $this->fields = array(
                 'bookID',
@@ -22,13 +23,13 @@ class Info{
                 'original-title',
                 'author',
                 'type',
-                'shelfID',
                 'language',
                 'registered',
             );
         }else if($type == "users"){
             $active_required = true;
             $this->id_field = "userID";
+            $this->history_id_field = "userID";
             $this->tbl = "lib_User";
             $this->fields = array(
                 'userID',
@@ -49,7 +50,7 @@ class Info{
             $this->id_field = "shelfID";
             $this->tbl = "lib_Shelf";
             $this->fields = array(
-                'shelfID',
+                'shelfNR',
                 'name'
             );
         }
@@ -61,7 +62,7 @@ class Info{
     }
     
     function getInfo(){
-        $get_info = "SELECT * FROM $this->tbl WHERE ".$this->fields[0]." = '$this->id' ".$this->active;
+        $get_info = "SELECT * FROM $this->tbl WHERE ".$this->id_field." = '$this->id' ".$this->active;
         $get_info_qry = $this->conn->query($get_info);
         if($get_info_qry->num_rows > 0){
             if($info = $get_info_qry->fetch_assoc()){
@@ -71,11 +72,17 @@ class Info{
                 }
                 if($this->type == "users"){
                     $res['contact'] = $this->getContactInfo();
-                }
-                if($this->type == "users" || $this->type == "books"){
-                    $res['lended'] = $this->getLendHistory();
+                    $res['lended'] = $this->getLendHistory(array($res['userID']));
                 }
                 $res['rfid'] = $this->getRFID();
+                if($this->type == "books"){
+                    $RFIDs = array();
+                    for($i = 0; $i < count($res['rfid']); $i++){
+                        $RFIDs[] = $res['rfid'][$i][0];
+                    }
+                    $res['lended'] = $this->getLendHistory($RFIDs);
+                }
+                
                 return $res;
             }
         }
@@ -104,15 +111,29 @@ class Info{
         return $res;
     }
     
-    function getLendHistory(){
+    function getLendHistory($ids){
+        $str = "";
+        foreach($ids as $id){
+            $str .= "$this->history_id_field = '".$id."' OR ";
+        }
+        $str = trim($str, " OR ");
         $res = array();
-        $get_lended = "SELECT * FROM lib_User_Book WHERE ".$this->fields[0]." = '$this->id'";
+        $get_lended = "SELECT * FROM lib_User_Book WHERE $str";
         $get_lended_qry = $this->conn->query($get_lended);
-        if($get_lended_qry->num_rows > 0){
+        if($get_lended_qry != null && $get_lended_qry->num_rows > 0){
             while($lended = $get_lended_qry->fetch_assoc()){
+                $bookID = "";
+                $get_book = "SELECT bookID FROM lib_RFID WHERE RFID = '".$lended['bookRFID']."'";
+                $get_book_qry = $this->conn->query($get_book);
+                if($get_book_qry->num_rows > 0){
+                    if($book = $get_book_qry->fetch_assoc()){
+                        $bookID = $book['bookID'];
+                    }
+                }
                 $res[] = array(
                     'userID' => $lended['userID'],
-                    'bookID' => $lended['bookID'],
+                    'bookID' => $bookID,
+                    'bookRFID' => $lended['bookRFID'],
                     'outDate' => $lended['outDate'],
                     'inDate' => $lended['inDate'],
                 );
@@ -127,7 +148,13 @@ class Info{
         $get_rfid_qry = $this->conn->query($get_rfid);
         if($get_rfid_qry->num_rows > 0){
             while($rfid = $get_rfid_qry->fetch_assoc()){
-                $res[] = $rfid['RFID'];
+                if($rfid['bookID'] == 0){
+                    $res[] = array($rfid['RFID']);
+                }else{
+                    require ROOT.'admin/list.class.php';
+                    $list = new Lists("shelves");
+                    $res[] = array($rfid['RFID'], $list->getShelfName($rfid['_shelfID']), $rfid['_shelfID']);
+                }
             }
         }
         return $res;
