@@ -1,14 +1,9 @@
 <?php
-
+if(!class_exists("Lists")){
 class Lists{
     function __construct($type, $order = null){
         //Connect to db
-        $connect = 'koble_til_database.php';
-        if(file_exists('../../../'.$connect)){
-            require '../../../'.$connect;
-        }else if(file_exists('../../'.$connect)){
-            require '../../'.$connect;
-        }
+        require ROOT.'../../koble_til_database.php';
         
         //Required variables
         $this->conn = $conn;
@@ -92,14 +87,15 @@ class Lists{
     
     function getShelfName($shelfID){
         if($shelfID != 0){
-            $get_shelf = "SELECT name FROM lib_Shelf WHERE shelfID = '".$shelfID."' LIMIT 1";
+            $get_shelf = "SELECT shelfNR, name FROM lib_Shelf WHERE shelfID = '".$shelfID."' LIMIT 1";
             $get_shelf_qry = $this->conn->query($get_shelf);
             if($get_shelf_qry->num_rows > 0){
                 if($shelf = $get_shelf_qry->fetch_assoc()){
-                    return $shelf['name'];
+                    return $shelf['shelfNR'].' - '.$shelf['name'];
                 }
             }
         }
         return "Ingen hylle";
     }
+}
 }
