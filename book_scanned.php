@@ -56,6 +56,9 @@ $action = 0;
     Deliver / lend the book
 */
 $date= (new DateTime())->format('Y-m-d H:i:s');
+$deliver_deadline = (new DateTime());
+$deliver_deadline->modify('+1 month');
+$deliver_deadline = $deliver_deadline->format('Y-m-d H:i:s');
 
 $res = array('error' => '', 'type' => 0);
 $deliver = array();
@@ -100,19 +103,19 @@ for($i = 0; $i < count($books); $i++){
 
 //Lend shiet
 for($i = 0; $i < count($lend); $i++){
-    $insert_user_book = "INSERT INTO lib_User_Book (userID, outDate, bookRFID) VALUES 
-        ('" . $lend[$i]['user'] . "', '" . $lend[$i]['date'] . "', '" . $lend[$i]['book']['RFID'] . "')";
+    $insert_user_book = "INSERT INTO lib_User_Book (userID, outDate, bookRFID, deliver_deadline) VALUES 
+        ('" . $lend[$i]['user'] . "', '" . $lend[$i]['date'] . "', '" . $lend[$i]['book']['RFID'] . "', '".$deliver_deadline."')";
     $insert_user_book_qry = $conn->query($insert_user_book);
     if($insert_user_book_qry === TRUE){
         //Success
         $res['status'][] = array(
-            'book_info' => get_book_info($lend[$i]['book']),
+            'book_info' => get_book_info($lend[$i]['book'], $deliver_deadline),
             'error' => $error['lend_success']
         );
     }else{
         //Failed lend book
         $res['status'][] = array(
-            'book_info' => get_book_info($lend[$i]['book']),
+            'book_info' => get_book_info($lend[$i]['book'], $deliver_deadline),
             'error' => $error['failed_to_lend_book']
         );
     }
@@ -134,7 +137,7 @@ if($where_st != ""){
         //Success
         for($i = 0; $i < count($deliver); $i++){
             $res['status'][] = array(
-                'book_info' => get_book_info($deliver[$i]),
+                'book_info' => get_book_info($deliver[$i], $deliver_deadline),
                 'error' => $error['deliver_success']
             );
         }
@@ -142,7 +145,7 @@ if($where_st != ""){
         //Failed
         for($i = 0; $i < count($deliver); $i++){
             $res['status'][] = array(
-                'book_info' => get_book_info($deliver[$i]),
+                'book_info' => get_book_info($deliver[$i], $deliver_deadline),
                 'error' => $error['failed_to_deliver_book']
             );
         }
@@ -171,7 +174,7 @@ if($user != 0){
 
 echo json_encode($res);
 
-function get_book_info($book){
+function get_book_info($book, $deliver_deadline){
     include 'admin/list.class.php';
     $list = new Lists("shelves");
     $shelf_name = $list->getShelfName($book['shelfID']);
@@ -180,7 +183,7 @@ function get_book_info($book){
         'author' => mb_convert_encoding($book['author'], 'HTML-ENTITIES', "UTF-8"),
         'ISBN10' => $book['ISBN10'],
         'ISBN13' => $book['ISBN13'],
-        'delivery_date' => 'xx.xx.xx',
+        'delivery_date' => $deliver_deadline,
         'shelf' => $shelf_name
     );
 }
