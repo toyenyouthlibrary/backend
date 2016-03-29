@@ -16,7 +16,7 @@ class Search{
             if (isset($string) && $string != "") {
                 $search = mb_convert_encoding($string,"UTF-8","HTML-ENTITIES");
                 
-                $sql = "SELECT bookID, title, author, language FROM lib_Book WHERE LOWER(Concat(bookID, ISBN10, ISBN13, author, title, `original-title`, registered)) like LOWER('%$search%')";
+                $sql = "SELECT bookID, title, author, language, type FROM lib_Book WHERE LOWER(Concat(bookID, ISBN10, ISBN13, author, title, `original-title`, registered)) like LOWER('%$search%')";
                 $res = $conn->query($sql);
                 
                 if ($res != null && $res->num_rows > 0) {

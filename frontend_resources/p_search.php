@@ -1,5 +1,5 @@
 <?php
-if(!isset($_POST['search']) && !isset($_GET['book'])){
+if(!isset($_POST['search']) && !isset($_GET['book']) && !isset($_GET['search'])){
     //If the user has not searched anything
 ?>
 <style>
@@ -35,7 +35,11 @@ input{
 </div>
 
 <?php
-}else if(isset($_POST['search'])){?>
+}else if(isset($_POST['search']) || isset($_GET['search'])){
+    if(isset($_POST['search'])){
+        header("Location: ".URL."&search=".$_POST['search']);
+    }
+        ?>
 <style>
 body{
     background-color: #4c9041;
@@ -64,7 +68,7 @@ input{
 <?php
     //If the user has searched some shit
     require ROOT.'search.class.php';
-    $search = new Search($_POST['search']);
+    $search = new Search($_GET['search']);
     if($search->error == ''){
         ?>
         
@@ -73,13 +77,14 @@ input{
                     <th>Tittel</th>
                     <th>Forfatter</th>
                     <th>Type</th>
-                    <th>Status</th>
+                    <th>Språk</th>
                 </tr>
         <?php
         foreach($search->result as $res){
             echo '<tr onclick="window.location.href= \''.URL.'&book='.$res['bookID'].'\'">';
             echo '<td>'.$res['title'].'</td>';
             echo '<td>'.$res['author'].'</td>';
+            echo '<td>'.$res['type'].'</td>';
             echo '<td>'.$res['language'].'</td>';
             echo '</tr>';
         }
@@ -101,7 +106,7 @@ input{
 </div>
 <?php
 }else if(isset($_GET['book'])){
-    require ROOT.'admin'.SLASH.'info.class.php';
+    require ROOT.'admin/info.class.php';
     $info = new Info("books", $_GET['book']);
     $i = $info->getInfo();
     $author = $i['author'];
@@ -154,11 +159,13 @@ input{
     </div><div id="info">
         <h3><?php echo $i['title']; ?>, <?php echo $author; ?>.</h3>
         <i>Synopsis</i><?php
+            //Print the type of the book
+            echo "<p>Type: ".$i['type']."</p>";
             //Include the list class to get the shelf name
-            include ROOT.'admin/list.class.php';
+            include_once ROOT.'admin/list.class.php';
             $lists = new Lists("shelves");
             //Include the scan_book class to get the book status
-            require ROOT.'scan_book.class.php';
+            include ROOT.'scan_book.class.php';
             $sb = new ScanBook();
             //
             require ROOT.'../../koble_til_database.php';
