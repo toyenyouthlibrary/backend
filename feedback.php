@@ -16,11 +16,10 @@ $error = array(
     'wrong_rfid_types' => 'Man m&aring; sende med 1 bok og 1 bruker.'
 );
 
-
-if(!isset($_POST['rfid']) || !isset($_POST['type']) || !isset($_POST['value'])){
+if(!isset($_POST['rfid']) || !isset($_POST['type']) || !isset($_POST['value']) || !isset($_POST['userrfid'])){
     j_die($error['missing_data']);
 }
-$rfid = $_POST['rfid'];
+$rfid = trim($_POST['rfid'], ";").";".trim($_POST['userrfid'], ";");
 $type = $_POST['type'];
 $value = $_POST['value'];
 
