@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("Info")){
 class Info{
     function __construct($type, $id){
         //Connect to db
@@ -73,6 +73,7 @@ class Info{
                 if($this->type == "users"){
                     $res['contact'] = $this->getContactInfo();
                     $res['lended'] = $this->getLendHistory(array($res['userID']));
+                    $res['settings'] = $this->getSettings();
                 }
                 $res['rfid'] = $this->getRFID();
                 if($this->type == "books"){
@@ -81,6 +82,7 @@ class Info{
                         $RFIDs[] = $res['rfid'][$i][0];
                     }
                     $res['lended'] = $this->getLendHistory($RFIDs);
+                    $res['rating'] = $this->getRating('book_rfid', $RFIDs);
                 }
                 
                 return $res;
@@ -159,4 +161,41 @@ class Info{
         }
         return $res;
     }
+    
+    function getSettings(){
+        $res = array('public_photos' => 0, 'save_log' => 0, 'save_visits' => 0, 'preferred_contact' => 0);
+        $get_settings = "SELECT * FROM lib_Settings WHERE userID = '".$this->id."'";
+        $get_settings_qry = $this->conn->query($get_settings);
+        if($get_settings_qry->num_rows > 0){
+            if($settings = $get_settings_qry->fetch_assoc()){
+                foreach($res as $key => $val){
+                    $res[$key] = $settings[$key];
+                }
+            }
+        }
+        return $res;
+    }
+    
+    function getRating($type, $ids){
+        $ratings = array('star', 'comment');
+        foreach($ids as $id){
+            $get_rating = "SELECT * FROM lib_Feedback WHERE `$type` = '$id'";
+            $get_rating_qry = $this->conn->query($get_rating);
+            if($get_rating_qry->num_rows > 0){
+                while($rating = $get_rating_qry->fetch_assoc()){
+                    $ratings[$rating['type']][] = array(
+                        'value' => $rating['value'],
+                        'user' => $rating['user_rfid']
+                    );
+                }
+            }
+        }
+        $sum = 0;
+        foreach($ratings['star'] as $star){
+            $sum += intval($star['value']);
+        }
+        $ratings['average_stars'] = ($sum / count($ratings['star']));
+        return $ratings;
+    }
+}
 }
