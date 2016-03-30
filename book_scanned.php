@@ -59,6 +59,7 @@ $date= (new DateTime())->format('Y-m-d H:i:s');
 $deliver_deadline = (new DateTime());
 $deliver_deadline->modify('+1 month');
 $deliver_deadline = $deliver_deadline->format('Y-m-d H:i:s');
+$deliver_deadline = explode(" ", $deliver_deadline)[0]." 00:00:00";
 
 $res = array('error' => '', 'type' => 0);
 $deliver = array();
@@ -67,6 +68,7 @@ require ROOT.'scan_book.class.php';
 $sb = new ScanBook();
 for($i = 0; $i < count($books); $i++){
     if($sb->isLended($books[$i]['rfid'])){
+        $user = $sb->user;
         //Book shall be delivered
         if($res['type'] !== "lend"){
             $res['type'] = 'deliver';
@@ -74,6 +76,7 @@ for($i = 0; $i < count($books); $i++){
             $info = new Info("books", $books[$i]['bookID']);
             $result = $info->getInfo();
             $result['RFID'] = $books[$i]['rfid'];
+            $result['shelfID'] = $books[$i]['shelfID'];
             $deliver[] = $result;
         }else{
             j_die($error['only_one_action_allowed']);
@@ -90,6 +93,7 @@ for($i = 0; $i < count($books); $i++){
             $info = new Info("books", $books[$i]['bookID']);
             $result = $info->getInfo();
             $result['RFID'] = $books[$i]['rfid'];
+            $result['shelfID'] = $books[$i]['shelfID'];
             $lend[] = array(
                 'user' => $user,
                 'date' => $date,
@@ -179,12 +183,13 @@ function get_book_info($book, $deliver_deadline){
     $list = new Lists("shelves");
     $shelf_name = $list->getShelfName($book['shelfID']);
     return array(
-        'title' => mb_convert_encoding($book['title'], 'HTML-ENTITIES', "UTF-8"),
-        'author' => mb_convert_encoding($book['author'], 'HTML-ENTITIES', "UTF-8"),
+        'title' => mb_convert_encoding($book['title'], "UTF-8", 'HTML-ENTITIES'),
+        'author' => mb_convert_encoding($book['author'], "UTF-8", 'HTML-ENTITIES'),
         'ISBN10' => $book['ISBN10'],
         'ISBN13' => $book['ISBN13'],
-        'delivery_date' => $deliver_deadline,
-        'shelf' => $shelf_name
+        'delivery_date' => explode(" ", $deliver_deadline)[0],
+        'shelf' => mb_convert_encoding($shelf_name, "UTF-8", 'HTML-ENTITIES'),
+        'rfid' => $book['RFID']
     );
 }
 ?>
