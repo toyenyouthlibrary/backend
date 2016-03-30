@@ -91,7 +91,7 @@ class Lists{
             $get_shelf_qry = $this->conn->query($get_shelf);
             if($get_shelf_qry->num_rows > 0){
                 if($shelf = $get_shelf_qry->fetch_assoc()){
-                    return $shelf['shelfNR'].' - '.$shelf['name'];
+                    return $shelf['shelfNR'].'. '.$shelf['name'];
                 }
             }
         }
