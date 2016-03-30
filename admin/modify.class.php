@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("Modify")){
 class Modify{
     function __construct(){
         //Connect to db
@@ -90,4 +90,5 @@ class Modify{
         
         return false;
     }
+}
 }

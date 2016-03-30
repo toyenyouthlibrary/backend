@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("Create")){
 class Create{
     function __construct(){
         //Connect to db
@@ -46,4 +46,5 @@ class Create{
         }
         return false;
     }
+}
 }

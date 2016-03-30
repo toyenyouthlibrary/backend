@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("CreateUsersAndBooks")){
 class CreateUsersAndBooks{
     function __construct($type){
         //Connect to db
@@ -144,4 +144,5 @@ class CreateUsersAndBooks{
         
         return false;
     }
+}
 }

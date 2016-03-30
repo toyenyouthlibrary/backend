@@ -1,4 +1,5 @@
 <?php
+if(!class_exists("RFID")){
 class RFID{
     function __construct(){
         require '../../koble_til_database.php';
@@ -20,4 +21,5 @@ class RFID{
             }
         }
     }
+}
 }

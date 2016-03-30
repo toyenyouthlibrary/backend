@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("RFID")){
 class RFID{
     function __construct(){
         //Connect to db
@@ -75,4 +75,5 @@ class RFID{
         }
         return $randomString;
     }
+}
 }

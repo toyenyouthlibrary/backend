@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("History")){
 class History{
     function __construct(){
         //Connect to db
@@ -44,4 +44,5 @@ class History{
         
         return $res;
     }
+}
 }

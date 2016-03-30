@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("Stats")){
 class Stats{
     function __construct($type, $id = 0, $display = array('multipler' => 86400,'amount' => 30), $future_timelimit = 0){
         //Connect to db
@@ -106,4 +106,5 @@ class Stats{
         
         return $final_res;
     }
+}
 }

@@ -1,5 +1,5 @@
 <?php
-
+if(!class_exists("User")){
 class User{
     public $id = 0;
     private $info = array();
@@ -47,4 +47,5 @@ class User{
         );
         return $res;
     }
+}
 }

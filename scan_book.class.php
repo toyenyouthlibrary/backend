@@ -1,9 +1,10 @@
 <?php
-
+if(!class_exists("ScanBook")){
 class ScanBook{
     function __construct(){
         require ROOT.'../../koble_til_database.php';
         $this->conn = $conn;
+        $this->user = "";
     }
     
     function isLended($rfid){
@@ -12,6 +13,7 @@ class ScanBook{
         if($get_lastlend_qry->num_rows > 0){
             if($lastlend = $get_lastlend_qry->fetch_assoc()){
                 if($lastlend['inDate'] == null){
+                    $this->user = $lastlend['userID'];
                     return true;
                 }
             }
@@ -30,4 +32,5 @@ class ScanBook{
     function get_book_info($book){
         
     }
+}
 }
