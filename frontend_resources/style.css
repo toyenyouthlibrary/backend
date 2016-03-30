@@ -4,6 +4,11 @@
     src: url('fonts/Mostardesign - Sofia Pro Black.otf');
 }
 
+@font-face {
+    font-family: SofiaProMedium;
+    src: url('fonts/Mostardesign - Sofia Pro Medium.otf');
+}
+
 body{
     height: 100%;
     width: 100%;
@@ -53,6 +58,10 @@ body, input{
     padding: 50px;
 }
 
+#text h2 img{
+    width: 23px;
+}
+
 #text table{
     width: 100%;
 }
@@ -61,10 +70,12 @@ body, input{
 }
 #text table tr td{
     vertical-align: middle;
+    font-family: SofiaProMedium;
 }
 
-#frem_tilbake img{
-    height: 20px;
+#footnotes a img{
+    height: 32px;
+    padding-right: 10px;
 }
 
 #footnotes{
@@ -80,6 +91,10 @@ input{
 }
 input.checkbox{
     min-width: initial;
+}
+
+i, p{
+    font-family: SofiaProMedium;
 }
 
 .bottom_left{
