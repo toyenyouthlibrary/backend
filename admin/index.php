@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 define("SLASH", "/");
 define("ROOT", getcwd().SLASH."..".SLASH);
 require '..'.SLASH.'..'.SLASH.'..'.SLASH.'koble_til_database.php';
@@ -24,6 +25,12 @@ $error = array(
     <link href="style.css" rel="stylesheet" />
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="tablesorter/jquery.tablesorter.js"></script>
+    <script>
+    $(document).ready(function(){ 
+        $("#order_tbl").tablesorter(); 
+    }); 
+    </script>
 </head>
 <body>
 <?php
@@ -164,7 +171,8 @@ if(isset($_GET['index'])){
                         'Navn' => array('firstname', 'lastname'),
                         'Fødselsdato' => 'birth',
                         'Kjønn' => 'sex',
-                        'Skole' => 'school'
+                        'Skole' => 'school',
+                        'Registrert' => 'registered'
                     )
                 )
             );
@@ -173,11 +181,11 @@ if(isset($_GET['index'])){
                 require 'list.class.php';
                 $list = new Lists($index_a[1]);
                 $list_res = $list->getList();
-                echo '<table cellspacing=0><tr>';
+                echo '<table id="order_tbl" cellspacing=0><thead><tr>';
                 foreach($fields[$index_a[1]]['fields'] as $key => $field){
                     echo '<th>'.$key.'</th>';
                 }
-                echo '</tr>';
+                echo '</tr></thead><tbody>';
                 foreach($list_res as $info){
                     echo '<tr onclick="window.location.href = \''.URL_ROOT.'info/'.$index_a[1].'/'.$info[$fields[$index_a[1]]['id']].'\';" style="cursor:pointer;">';
                         foreach($fields[$index_a[1]]['fields'] as $field){
@@ -193,7 +201,7 @@ if(isset($_GET['index'])){
                         }
                     echo '</tr>';
                 }
-                echo '</table>';
+                echo '</tbody></table>';
             }else{
                 echo 'Ukjent.';
             }
@@ -534,6 +542,26 @@ function print_info($info){
         }
     }
     
+    //Settings
+    if($type == 'user'){
+        if(isset($info['settings']) && is_array($info['settings'])){
+            echo '<h2>Innstillinger</h2>';/*'public_photos' => 0, 'save_log' => 0, 'save_visits' => 0, 'preferred_contact' => 0*/
+            echo '<form action="'.URL_ROOT.'modify/settings/'.$info[$type."ID"].'/'.$info[$type."ID"].'" method="POST"><table cellspacing=0>';
+            foreach($info['settings'] as $keyy => $vall){
+                if($keyy == "preferred_contact"){
+                    
+                    
+                }else{
+                    echo '<tr><td>'.$keyy.'</td><td><select name="'.$keyy.'">';
+                    $poss_vals = array('0' => 'Ikke tillatt', '1' => 'Tillatt');
+                    foreach($poss_vals as $k => $v){ $se = ''; if($k == $vall){$se = 'selected="selected"';} echo '<option value="'.$k.'">'.$v.'</option>';  }
+                    echo '</select></td></tr>';
+                }
+            }
+            echo '<tr><td colspan=2><button>Oppdater</button></td></tr></table></form>';
+        }
+    }
+    
     //RFID
     echo '<h2>RFID</h2>';
     if(isset($info['rfid']) && is_array($info['rfid'])){
@@ -544,7 +572,8 @@ function print_info($info){
             echo '<form action="'.URL_ROOT.'modify/rfid/'.get_plural($type).'/'.$info[$type."ID"].'" method="POST" id="rfid_'.$key.'">';
             echo '<p class="p '.$rfid[0].'" style="display:inline;">'.$rfid[0].'</p>';
             echo '<input type="hidden" name="original" class="original" value="'.$rfid[0].'" />';
-            echo '<input type="hidden" name="new" class="new" /><input type="hidden" name="_shelfID" value="'.$rfid[2].'" />';
+            echo '<input type="hidden" name="new" class="new" />'; 
+            if($type == "book"){echo '<input type="hidden" name="_shelfID" value="'.$rfid[2].'" />'; }
             echo '</form></td>';
             echo '<td style="border-right: 1px solid black;"><input type="button" value="Endre" onclick="change_rfid('.$key.')" /> <input type="button" value="Slett" onclick="window.location.href=\''.URL_ROOT.'rfid/delete/'.$rfid[0].'/'.$type.'/'.$info[$type."ID"].'\'" /></td>';
             if($type == "book"){
