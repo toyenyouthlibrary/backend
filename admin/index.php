@@ -5,7 +5,7 @@ define("ROOT", getcwd().SLASH."..".SLASH);
 require '..'.SLASH.'..'.SLASH.'..'.SLASH.'koble_til_database.php';
 session_start();
 //Fech the user credentials from file that is not publicly available ^_^
-require '..'.SLASH.'..'.SLASH.'..'.SLASH.'admin_credentials.php';
+//require '..'.SLASH.'..'.SLASH.'..'.SLASH.'admin_credentials.php';
 
 //Initialize result array with the part that will always be the same
 $res = array('error' => '');
@@ -25,7 +25,7 @@ $error = array(
     <link href="style.css" rel="stylesheet" />
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script type="text/javascript" src="tablesorter/jquery.tablesorter.js"></script>
+    <script type="text/javascript" src="../../tablesorter/jquery.tablesorter.js"></script>
     <script>
     $(document).ready(function(){ 
         $("#order_tbl").tablesorter(); 
@@ -40,26 +40,27 @@ $error = array(
 */
 
 $die = true;
-
-if(!isset($_POST['user']) || !isset($_POST['pass'])){
-    
-}else{
-    if(isset($users[$_POST['user']]) && $users[$_POST['user']] == $_POST['pass']){
+/*
+if(isset($_SESSION['id'])){
+    $login = login($_SESSION['id']);
+    if($login == false){
+        unset($_SESSION['id']);
+    }else{
         $die = false;
-        $inf = array(
-            'name' => $_POST['user'],
-            'pass' => $_POST['pass']
-        );
+        $_SESSION['id'] = $_SESSION['id'];
     }
-}
-if(isset($_POST['id']) && exists_id($_POST['id'])){
-    $die = false;
+}else if(isset($_POST['user']) && $_POST['user'] != '' && isset($_POST['pass']) && $_POST['pass'] != ''){
+    $login = login('', $_POST['user'], $_POST['pass']);
+    if($login != false){
+        $die = false;
+        $_SESSION['id'] = $login;
+    }
 }
 
 if($die){
     j_die($error['failed_login']);
 }
-$res['id'] = 109342903234;
+*/
 
 //Link root
 if(isset($_POST['debug'])){
@@ -189,15 +190,20 @@ if(isset($_GET['index'])){
                 foreach($list_res as $info){
                     echo '<tr onclick="window.location.href = \''.URL_ROOT.'info/'.$index_a[1].'/'.$info[$fields[$index_a[1]]['id']].'\';" style="cursor:pointer;">';
                         foreach($fields[$index_a[1]]['fields'] as $field){
-                            echo '<td>';
-                            if(is_array($field)){
-                                foreach($field as $subfield){
-                                    echo $info[$subfield]." ";
-                                }
+                            if($field == "sex"){
+                                $sex = array(0 => 'Ikke spesifisert', 1 => 'Gutt', 2 => 'Jente');
+                                echo '<td>'.$sex[$info[$field]].'</td>';
                             }else{
-                                echo $info[$field];
+                                echo '<td>';
+                                if(is_array($field)){
+                                    foreach($field as $subfield){
+                                        echo $info[$subfield]." ";
+                                    }
+                                }else{
+                                    echo $info[$field];
+                                }
+                                echo '</td>';
                             }
-                            echo '</td>';
                         }
                     echo '</tr>';
                 }
@@ -287,6 +293,9 @@ if(isset($_GET['index'])){
             }else if($index_a[1] == "shelf"){
                 $tbl = "lib_Shelf";
                 $return = "shelves";
+            }else if($index_a[1] == "setting"){
+                $tbl = "lib_Settings";
+                $return = "users";
             }
             
             if(isset($tbl)){
@@ -316,7 +325,7 @@ if(isset($_GET['index'])){
                 $ci = new ContactInfo();
                 $res = $ci->add($index_a[2]);
                 if($res == true){
-                    header("Location: ".URL_ROOT."users/info/".$index_a[2]);
+                    header("Location: ".URL_ROOT."info/users/".$index_a[2]);
                     echo "Vellykket.";
                 }else{
                     echo "Feilet<br>".$ci->error;
@@ -327,7 +336,7 @@ if(isset($_GET['index'])){
                     $ci = new ContactInfo();
                     $res = $ci->delete($index_a[2]);
                     if($res == true){
-                        header("Location: ".URL_ROOT."users/info/".$index_a[3]);
+                        header("Location: ".URL_ROOT."info/users/".$index_a[3]);
                         echo "Vellykket.";
                     }else{
                         echo "Feilet<br>".$ci->error;
@@ -526,7 +535,7 @@ function print_info($info){
         //Contact info
         if(isset($info['contact']) && is_array($info['contact'])){
             echo '<h2>Kontaktinformasjon</h2>';
-            echo '<table cellspacing=0><tr><th>Telefon</th><th colspan=2>Email</th></tr>';
+            echo '<table cellspacing=0><tr><th>Telefon</th><th>Email</th><th colspan=2>Comment</th></tr>';
             foreach($info['contact'] as $contact){
                 echo '<tr><form action="'.URL_ROOT.'modify/contact/'.$contact['contactID'].'/'.$info[$type."ID"].'" method="POST">';
                 foreach($contact as $key => $cont){
@@ -537,7 +546,7 @@ function print_info($info){
                 echo '<td><button>Oppdater</button><input type="button" value="Slett" onclick="window.location.href = \''.URL_ROOT.'contact/delete/'.$contact['contactID'].'/'.$info[$type."ID"].'\'" /></td>';
                 echo '</form></tr>';
             }
-            echo '<tr><td colspan=3><input type="button" value="Legg til" onclick="window.location.href = \''.URL_ROOT.'contact/add/'.$info[$type."ID"].'\'" /></td></tr>';
+            echo '<tr><td colspan=4><input type="button" value="Legg til" onclick="window.location.href = \''.URL_ROOT.'contact/add/'.$info[$type."ID"].'\'" /></td></tr>';
             echo '</table>';
         }
     }
@@ -546,15 +555,20 @@ function print_info($info){
     if($type == 'user'){
         if(isset($info['settings']) && is_array($info['settings'])){
             echo '<h2>Innstillinger</h2>';/*'public_photos' => 0, 'save_log' => 0, 'save_visits' => 0, 'preferred_contact' => 0*/
-            echo '<form action="'.URL_ROOT.'modify/settings/'.$info[$type."ID"].'/'.$info[$type."ID"].'" method="POST"><table cellspacing=0>';
+            echo '<form action="'.URL_ROOT.'modify/setting/'.$info['settings']["settingID"].'/'.$info[$type."ID"].'" method="POST"><table cellspacing=0>';
             foreach($info['settings'] as $keyy => $vall){
+                if ($keyy == "settingID"){ echo "<input type='hidden' name='$keyy' value='$vall' />"; }else 
                 if($keyy == "preferred_contact"){
-                    
-                    
+                    echo '<tr><td>Foretrukket kontakt</td><td><select name="'.$keyy.'">';
+                    //List contact-infos and display them by their comment
+                    foreach($info['contact'] as $contact){
+                        echo '<option value="'.$contact['contactID'].'">'.$contact['comment'].'</option>';
+                    }
+                    echo '</select></td></tr>';
                 }else{
                     echo '<tr><td>'.$keyy.'</td><td><select name="'.$keyy.'">';
-                    $poss_vals = array('0' => 'Ikke tillatt', '1' => 'Tillatt');
-                    foreach($poss_vals as $k => $v){ $se = ''; if($k == $vall){$se = 'selected="selected"';} echo '<option value="'.$k.'">'.$v.'</option>';  }
+                    $poss_vals = array(0 => 'Ikke tillatt', 1 => 'Tillatt');
+                    foreach($poss_vals as $k => $v){ $se = ''; if($k == $vall){$se = 'selected="selected"';} echo '<option value="'.$k.'" '.$se.'>'.$v.'</option>';  }
                     echo '</select></td></tr>';
                 }
             }
