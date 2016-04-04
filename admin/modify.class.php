@@ -36,7 +36,8 @@ class Modify{
         }else if($tbl == 'lib_Contact'){
             $fields = array(
                 'phone',
-                'email'
+                'email',
+                'comment'
             );
         }else if($tbl == 'lib_RFID'){
             $fields = array(
@@ -47,6 +48,13 @@ class Modify{
             $fields = array(
                 'name',
                 'shelfNR'
+            );
+        }else if($tbl == "lib_Settings"){
+            $fields = array(
+                'public_photos',
+                'save_log',
+                'save_visits',
+                'preferred_contact'
             );
         }else{
             $this->error = "Det er ikke mulig å endre denne tabellen.";

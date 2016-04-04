@@ -104,7 +104,8 @@ class Info{
                         $res[] = array(
                             'contactID' => $contact['contactID'],
                             'phone' => $contact['phone'],
-                            'email' => $contact['email']
+                            'email' => $contact['email'],
+                            'comment' => $contact['comment']
                         );
                     }
                 }
@@ -168,6 +169,7 @@ class Info{
         $get_settings_qry = $this->conn->query($get_settings);
         if($get_settings_qry->num_rows > 0){
             if($settings = $get_settings_qry->fetch_assoc()){
+                $res['settingID'] = $settings['settingID'];
                 foreach($res as $key => $val){
                     $res[$key] = $settings[$key];
                 }
@@ -177,7 +179,7 @@ class Info{
     }
     
     function getRating($type, $ids){
-        $ratings = array('star', 'comment');
+        $ratings = array('star' => array(), 'comment' => array());
         foreach($ids as $id){
             $get_rating = "SELECT * FROM lib_Feedback WHERE `$type` = '$id'";
             $get_rating_qry = $this->conn->query($get_rating);
@@ -194,7 +196,10 @@ class Info{
         foreach($ratings['star'] as $star){
             $sum += intval($star['value']);
         }
-        $ratings['average_stars'] = ($sum / count($ratings['star']));
+        $ratings['average_stars'] = 0;
+        if(count($ratings['star']) > 0){
+            $ratings['average_stars'] = ($sum / count($ratings['star']));
+        }
         return $ratings;
     }
 }
