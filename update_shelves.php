@@ -1,11 +1,29 @@
 <?php
+/*
+POST /api/update_shelves.php HTTP/1.1
+Host: tung.deichman.no
+Cache-Control: no-cache
+Content-Type: application/x-www-form-urlencoded
+
+rfid=urn%3Aepc%3Aid%3Asgtin%3A9788251.966241.11258753042&shelf_id=1
+*/
 require('../../koble_til_database.php');
 session_start();
+
+$log = "INSERT INTO `lib_Error` (`timestamp`, `error`, `post`, `get`) VALUES 
+    ('".time()."', '', 
+    '".str_replace("'", "\'", mb_convert_encoding(json_encode($_POST), "UTF-8", 'HTML-ENTITIES'))."', 
+    '".str_replace("'", "\'", mb_convert_encoding(json_encode($_GET), "UTF-8", 'HTML-ENTITIES'))."')";
+$log_qry = $conn->query($log);
 
 $res = array('error' => '');
 $error = array(
     'no_shelf' => 'Ingen hylle er blitt registrert'
 );
+
+if(isset($_GET['shelf_id'])){
+    $_POST['shelf_id'] = $_GET['shelf_id'];
+}
 
 $post_vars = array(
     'obligatory' => array(
