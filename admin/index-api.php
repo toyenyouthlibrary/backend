@@ -14,7 +14,7 @@ $error = array(
 //User verification
 $die = true;
 
-if(!isset($_POST['user']) || !isset($_POST['pass'])){
+/*if(!isset($_POST['user']) || !isset($_POST['pass'])){
     
 }else{
     if(isset($users[$_POST['user']]) && $users[$_POST['user']] == $_POST['pass']){
@@ -32,7 +32,9 @@ if(isset($_POST['id']) && exists_id($_POST['id'])){
 if($die){
     j_die($error['failed_login']);
 }
-$res['id'] = 109342903234;
+$res['id'] = 109342903234;*/
+
+die();
 
 if(isset($_GET['index'])){
     $index = $_GET['index'];
